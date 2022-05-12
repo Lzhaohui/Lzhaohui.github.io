@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/"><meta property="og:locale" content="zh-CN"><meta name="description" content="Could not resolve host: aur.tuna.tsinghua.edu.cn问题由于aur上游的一些问题，清华镜像于2022年3月1日移除aur镜像服务。所以自从3月份以后，本人使用manjaro系统的yay更新软件包，总是会报找不到aur.tuna.tsinghua.edu.cn的错误如下： 12获取 google-chrome 时出错: fatal: 无法访问 &amp;#x27; - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="manjaro, yay, aur, 清华源"><meta property="article:published_time" content="2022-05-12T06:45:10.000Z"><meta property="article:modified_time" content="2022-05-12T07:21:02.376Z"><meta property="og:updated_time" content="2022-05-12T07:21:02.376Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="manjaro, yay, aur, 清华源"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/"
+    },
+    "headline": "yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-05-12T06:45:10.000Z",
+    "dateModified": "2022-05-12T07:21:02.376Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "manjaro, yay, aur, 清华源",
+    "description": "Could not resolve host: aur.tuna.tsinghua.edu.cn问题由于aur上游的一些问题，清华镜像于2022年3月1日移除aur镜像服务。所以自从3月份以后，本人使用manjaro系统的yay更新软件包，总是会报找不到aur.tuna.tsinghua.edu.cn的错误如下： 12获取 google-chrome 时出错: fatal: 无法访问 &amp;amp;#x27; - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPQAAAD0CAAAAACJRFQiAAAEmUlEQVR42u2bwW5jMQwD8/8/vXttiz5x6OYSa3Jp2ia2xwEEiWRe/xY+XkILLbTQQgv9YdCv4fHtDV9+//r/397z8/nPNX57/W/7PO3/cw/KIbTQW6DTJglg+vl0yHRYcrb2soQWehP004ZTwZjWeCwmD+DT/1LhxEVSaKGFRpAJaFqTFMJpf6GFFvp90GTjqchNTUU6g9BCC302cDwVrXccmFzykzBBzyK00BuhySD/CT/fpoYKLfQHQ0fTaxgoktiexPppIGkbpre6lkIL/cHQaSCgojwpgNP66TKoWDGtL7TQG6CJkJfAyMHpa9ri2BQ0oYXeAD0VjnSwJMLTRqU13KeLH4UGoYVeBE0KAxUaiPGWilNaI4mXQgu9HToVL2oAUIGAGgxU4EABPqGFXgLdmN2pcCVhMQXh6bpkQIoGntBCXwqdFkrNyjQo0OYiiQE0hDcOOkILvQAaDd/DwkSAmMI1JOhKxMI0qAgt9DboE0hyyBNxgRoF7d+EFnoT9CQI0KJBgjKnX1pBgdc2PCe00IugqQhPN01iBG1UqMiBOzKhhb4MOjUWaQghYkH7HhLOSx8OSgwKLfSF0G0BIkHYdmAhJmEy45HZILTQS6CjSA4bi9SMEBgi/DXh96icCC30ZdCteEADNukSp4aDDjrHYr/QQl8MnYS9RoRLl9ZcXDL9m2ZJaKE3QadCQQw7GtChDctU1NLzqUkRWugN0CToRs2zJmhDm55GQIxFVGihF0G3TQdtRJLY8E5hMg0xQgu9CZoMGY2wTow3IvyRokkaIKGF3gTdmGNJRKSXNQFPzVC7rtBCb4OmYiAJptKihMX5IPSRoM2jMCi00JdDU4OMGH7JtE/mQiMOHA0cQgt9MTRpAEjhoYchDU4SFUmwJrqWQgt9KTQJwZFADC1oVMAnoT76gQkt9DZoOtDT19KiQ0N5pyLjo4EntNBLoEm4NDUMKYAzNTfThdECOZ5XaKEXQP8lNEMORArUVODIZUyXiFxLoYW+DPrEwEsDSivsp2GFFsnxgoUWegk0DdDQRuSkoUiFLRkJ6cMTWugt0CT4SgIuadhP6yOx/sW/4DKG54QWegF0Kgw0yDbBTkJE2q89KxIGhRb6UmjyvA3O0QElrUUN+KnYCi30Vuhk2k1G2UmhIU0QMRWwSCG00Aug3zlQ0IBOE3ZNxZIURKGF3gSdjDdqmjdCQRIXWzOeNlNCC70ZOpl6RNQ7aUboBSbgOHAILfSl0PRQBO5EoCdiYGsW1OE5oYW+CDoFXadGvwnWTRd8MkykgjYGbYQW+nLoJAw0TUArIibBj4h/2EwUWugF0KkpmIaOEyGxgU3ifWMMCi30dugk7qcgTTpME4r9i2lQFTKhhb4AmhaZJA6mg6VCeGIETOeKSQShhb4YmgzqaXESaqdCADELG3NfaKE3QhPzmwqFVFSkF02alhTWE1poobsvi9OmgTYk01BDjDvscAgt9EJoYgI0AmAbhiODUWpahBZ6GzQR/FJxoU1CHPahgF8H+IQWegk0GRSo4EAP1VwENQVi8yK00AugNz2EFlpooYUW+kMe/wFa6TP+EsLSOgAAAABJRU5ErkJggg==" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-05-12</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn&url=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=yay换源后更新包仍使用旧源: Could not resolve host: aur.tuna.tsinghua.edu.cn&url=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/05/12/yay%E6%8D%A2%E6%BA%90%E5%90%8E%E6%9B%B4%E6%96%B0%E5%8C%85%E4%BB%8D%E4%BD%BF%E7%94%A8%E6%97%A7%E6%BA%90-Could-not-resolve-host-aur-tuna-tsinghua-edu-cn/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPQAAAD0CAAAAACJRFQiAAAEmUlEQVR42u2bwW5jMQwD8/8/vXttiz5x6OYSa3Jp2ia2xwEEiWRe/xY+XkILLbTQQgv9YdCv4fHtDV9+//r/397z8/nPNX57/W/7PO3/cw/KIbTQW6DTJglg+vl0yHRYcrb2soQWehP004ZTwZjWeCwmD+DT/1LhxEVSaKGFRpAJaFqTFMJpf6GFFvp90GTjqchNTUU6g9BCC302cDwVrXccmFzykzBBzyK00BuhySD/CT/fpoYKLfQHQ0fTaxgoktiexPppIGkbpre6lkIL/cHQaSCgojwpgNP66TKoWDGtL7TQG6CJkJfAyMHpa9ri2BQ0oYXeAD0VjnSwJMLTRqU13KeLH4UGoYVeBE0KAxUaiPGWilNaI4mXQgu9HToVL2oAUIGAGgxU4EABPqGFXgLdmN2pcCVhMQXh6bpkQIoGntBCXwqdFkrNyjQo0OYiiQE0hDcOOkILvQAaDd/DwkSAmMI1JOhKxMI0qAgt9DboE0hyyBNxgRoF7d+EFnoT9CQI0KJBgjKnX1pBgdc2PCe00IugqQhPN01iBG1UqMiBOzKhhb4MOjUWaQghYkH7HhLOSx8OSgwKLfSF0G0BIkHYdmAhJmEy45HZILTQS6CjSA4bi9SMEBgi/DXh96icCC30ZdCteEADNukSp4aDDjrHYr/QQl8MnYS9RoRLl9ZcXDL9m2ZJaKE3QadCQQw7GtChDctU1NLzqUkRWugN0CToRs2zJmhDm55GQIxFVGihF0G3TQdtRJLY8E5hMg0xQgu9CZoMGY2wTow3IvyRokkaIKGF3gTdmGNJRKSXNQFPzVC7rtBCb4OmYiAJptKihMX5IPSRoM2jMCi00JdDU4OMGH7JtE/mQiMOHA0cQgt9MTRpAEjhoYchDU4SFUmwJrqWQgt9KTQJwZFADC1oVMAnoT76gQkt9DZoOtDT19KiQ0N5pyLjo4EntNBLoEm4NDUMKYAzNTfThdECOZ5XaKEXQP8lNEMORArUVODIZUyXiFxLoYW+DPrEwEsDSivsp2GFFsnxgoUWegk0DdDQRuSkoUiFLRkJ6cMTWugt0CT4SgIuadhP6yOx/sW/4DKG54QWegF0Kgw0yDbBTkJE2q89KxIGhRb6UmjyvA3O0QElrUUN+KnYCi30Vuhk2k1G2UmhIU0QMRWwSCG00Aug3zlQ0IBOE3ZNxZIURKGF3gSdjDdqmjdCQRIXWzOeNlNCC70ZOpl6RNQ7aUboBSbgOHAILfSl0PRQBO5EoCdiYGsW1OE5oYW+CDoFXadGvwnWTRd8MkykgjYGbYQW+nLoJAw0TUArIibBj4h/2EwUWugF0KkpmIaOEyGxgU3ifWMMCi30dugk7qcgTTpME4r9i2lQFTKhhb4AmhaZJA6mg6VCeGIETOeKSQShhb4YmgzqaXESaqdCADELG3NfaKE3QhPzmwqFVFSkF02alhTWE1poobsvi9OmgTYk01BDjDvscAgt9EJoYgI0AmAbhiODUWpahBZ6GzQR/FJxoU1CHPahgF8H+IQWegk0GRSo4EAP1VwENQVi8yK00AugNz2EFlpooYUW+kMe/wFa6TP+EsLSOgAAAABJRU5ErkJggg==" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Could-not-resolve-host-aur-tuna-tsinghua-edu-cn"><span class="post-toc-number">1.</span> <span class="post-toc-text">Could not resolve host: aur.tuna.tsinghua.edu.cn</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%A7%A3%E5%86%B3"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">解决</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%80%BB%E7%BB%93"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">总结</span></a></li></ol></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h2 id="Could-not-resolve-host-aur-tuna-tsinghua-edu-cn"><a href="#Could-not-resolve-host-aur-tuna-tsinghua-edu-cn" class="headerlink" title="Could not resolve host: aur.tuna.tsinghua.edu.cn"></a>Could not resolve host: aur.tuna.tsinghua.edu.cn</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>由于aur上游的一些问题，清华镜像于2022年3月1日<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/news/remove-aur/">移除aur镜像服务</a>。所以自从3月份以后，本人使用manjaro系统的yay更新软件包，总是会报找不到aur.tuna.tsinghua.edu.cn的错误如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">获取 google-chrome 时出错: fatal: 无法访问 &#x27;https://aur.tuna.tsinghua.edu.cn/google-chrome.git/&#x27;：Could not resolve host: aur.tuna.tsinghua.edu.cn </span><br><span class="line">         context: exit status 1</span><br></pre></td></tr></table></figure>
+<p>因为其实该<a target="_blank" rel="noopener" href="https://aur.tuna.tsinghua.edu.cn/">网址</a>已经不存在,之前在yay上设置的清华源还指向了这个地址所以报错。</p>
+<p>于是想到将yay的源换回为默认的源<a target="_blank" rel="noopener" href="https://aur.archlinux.org/">https://aur.archlinux.org</a>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yay --save --aururl <span class="string">&quot;https://aur.archlinux.org&quot;</span></span><br></pre></td></tr></table></figure>
+<p>但是依旧报错找不到aur.tuna.tsinghua.edu.cn,查看yay的配置文件也显示修改成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi ~/.config/yay/config.json</span><br></pre></td></tr></table></figure>
+<p>网上搜集了很久也没找到原因和解决办法，拖了2个多月无法更新系统的软件，试过用各种方法重新安装yay也没有用。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>终于在今天无法忍受而把它解决掉了，其实很简单，清空yay的.cache即可。<br>使用grep命令从系统根目录下查找aur.tuna.tinghua.edu.cn关键字：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi ~/.config/yay/config.json</span><br></pre></td></tr></table></figure>
+<p>发现在.cache&#x2F;yay文件中有许多相关内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lzh/.cache/yay/google-chrome/.git/logs/refs/heads/master:1:0000000000000000000000000000000000000000 0836c2542add58e17c2a745660c4cd4769b568e1 lzh &lt;137211885@qq.com&gt; 1638618792 +0800  clone: from https://aur.tuna.tsinghua.edu.cn/google-chrome.git</span><br><span class="line">lzh/.cache/yay/google-chrome/.git/logs/refs/remotes/origin/HEAD:1:0000000000000000000000000000000000000000 0836c2542add58e17c2a745660c4cd4769b568e1 lzh &lt;137211885@qq.com&gt; 1638618792 +0800   clone: from https://aur.tuna.tsinghua.edu.cn/google-chrome.git</span><br><span class="line">lzh/.cache/yay/google-chrome/.git/logs/HEAD:1:0000000000000000000000000000000000000000 0836c2542add58e17c2a745660c4cd4769b568e1 lzh &lt;137211885@qq.com&gt; 1638618792 +0800       clone: from https://aur.tuna.tsinghua.edu.cn/google-chrome.git</span><br></pre></td></tr></table></figure>
+<p>于是想到原因可能是由于yay之前缓存了旧的不可用的地址，导致后面更新依旧重定向到了旧地址，所以尝试把yay所有的缓存文件删除：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">rm</span> .cache/yay -r -f</span><br></pre></td></tr></table></figure>
+<p>再次执行更新…成功！！</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>其实原因很简单，就是yay的包缓存文件缓存了旧的不可用地址，只要删除相关的缓存即可。而这种情况只会出现在更新之前旧的使用国内源下载的软件，使用yay下载没下过的包都不会有问题。于是我就卡了好久没更新，网上搜索也都是如何更换yay源的教程，这种小问题几乎找不到解决方案。希望可以帮助到有相同问题的小伙伴！</p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-05-12");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-05-12T06:45:10.000Z" itemprop="datePublished">2022-05-12</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/manjaro/" rel="tag">#&nbsp;manjaro</a>
+
+<a class="post-tags-list-item" href="/tags/yay/" rel="tag">#&nbsp;yay</a>
+
+<a class="post-tags-list-item" href="/tags/aur/" rel="tag">#&nbsp;aur</a>
+
+<a class="post-tags-list-item" href="/tags/%E6%B8%85%E5%8D%8E%E6%BA%90/" rel="tag">#&nbsp;清华源</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/02/25/JavaScript-js-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">JavaScript js 正则表达式</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>
