@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>clean code笔记 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="clean code笔记 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/"><meta property="og:locale" content="zh-CN"><meta name="description" content="简介观看笔记：Clean Code（整洁代码）Bob大叔现场演讲合集 - Bob大叔激情四射的演讲 让你重拾对编程的热情，对代码的执着。 理念 写代码是给需要理解的人看的。 clean code走的慢，但是走的好，走的好才能走的远。  代码规范 代码扁平化。 一个函数最好在一个屏幕内写完。 同一个函数内容抽象层次相同。 金字塔语义设计，标题、摘要、详情。 一个函数只做一件事。即不能从中再抽象出更多 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="clean code"><meta property="article:published_time" content="2022-11-15T14:25:33.000Z"><meta property="article:modified_time" content="2022-11-15T14:32:24.524Z"><meta property="og:updated_time" content="2022-11-15T14:32:24.524Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="clean code"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/"
+    },
+    "headline": "clean code笔记 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-11-15T14:25:33.000Z",
+    "dateModified": "2022-11-15T14:32:24.524Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "clean code",
+    "description": "简介观看笔记：Clean Code（整洁代码）Bob大叔现场演讲合集 - Bob大叔激情四射的演讲 让你重拾对编程的热情，对代码的执着。 理念 写代码是给需要理解的人看的。 clean code走的慢，但是走的好，走的好才能走的远。  代码规范 代码扁平化。 一个函数最好在一个屏幕内写完。 同一个函数内容抽象层次相同。 金字塔语义设计，标题、摘要、详情。 一个函数只做一件事。即不能从中再抽象出更多 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=clean code笔记" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=clean code笔记&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=clean code笔记" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAAAAABQV18IAAAB3UlEQVR42u3b0W6DMAyFYd7/pberSt0U+xxvVEoOPzetKIUPycSJE66vDbcLFChQoBaoq9nef399X+17ff99vh8XFNcBlYVaBl2xvzpOHe9cB1QWahXg1f7VMd057GNAPQLVfe8CedWoggLlQlYPAihQ7gXViatEfWsvAdT2KDVwuOvz1tEMqG1RdvGh6Ow5D8rHqi6gtkRVf+4S6qSTpzqLspcA6jjUCuEWxFa/deeUgxJQEShV2FAPQzVYcG8AVCaqC1TnuK6xVUldJmRQx6GqIFQNqBvMzs2AykKpAO+CeVLUUAkbVCaqa/ycor/T+NqjGVDHoiawqtA2bYjL84KKQKkAVMXTSaDLgQioGJSa/FEFC6dw5kyUg8pAqUlEp8iqPscFDlBHo9xCqVp46hbfRgkZ1NEoVeCaDkCdRc6gMlEqoXYXcBaZjiaPQEWgnJck3IGlk3RHPU9QR6KcIofT+DmNqJxkAhWBqgJWBaob+M4iRFBZKLW5xfzpJIHVeII6EjVZ0KwWD/77JTJQMShnEKGSrHMT8mEBFYVykvC0yCZftAD1aNQkubqLvUA9E+UuFHQHIG2CBxWFcoLamaD+y+IvUHkoNXDogltNCrkJHFQOaqcNFChQoN62b0ktHr29Mn2LAAAAAElFTkSuQmCC" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">clean code笔记</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-11-15</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=clean code笔记&url=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=clean code笔记&url=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/11/15/clean-code%E7%AC%94%E8%AE%B0/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAAAAABQV18IAAAB3UlEQVR42u3b0W6DMAyFYd7/pberSt0U+xxvVEoOPzetKIUPycSJE66vDbcLFChQoBaoq9nef399X+17ff99vh8XFNcBlYVaBl2xvzpOHe9cB1QWahXg1f7VMd057GNAPQLVfe8CedWoggLlQlYPAihQ7gXViatEfWsvAdT2KDVwuOvz1tEMqG1RdvGh6Ow5D8rHqi6gtkRVf+4S6qSTpzqLspcA6jjUCuEWxFa/deeUgxJQEShV2FAPQzVYcG8AVCaqC1TnuK6xVUldJmRQx6GqIFQNqBvMzs2AykKpAO+CeVLUUAkbVCaqa/ycor/T+NqjGVDHoiawqtA2bYjL84KKQKkAVMXTSaDLgQioGJSa/FEFC6dw5kyUg8pAqUlEp8iqPscFDlBHo9xCqVp46hbfRgkZ1NEoVeCaDkCdRc6gMlEqoXYXcBaZjiaPQEWgnJck3IGlk3RHPU9QR6KcIofT+DmNqJxkAhWBqgJWBaob+M4iRFBZKLW5xfzpJIHVeII6EjVZ0KwWD/77JTJQMShnEKGSrHMT8mEBFYVykvC0yCZftAD1aNQkubqLvUA9E+UuFHQHIG2CBxWFcoLamaD+y+IvUHkoNXDogltNCrkJHFQOaqcNFChQoN62b0ktHr29Mn2LAAAAAElFTkSuQmCC" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-number">1.</span> <span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%90%86%E5%BF%B5"><span class="post-toc-number">2.</span> <span class="post-toc-text">理念</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83"><span class="post-toc-number">3.</span> <span class="post-toc-text">代码规范</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B3%A8%E9%87%8A"><span class="post-toc-number">4.</span> <span class="post-toc-text">注释</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">5.</span> <span class="post-toc-text">测试</span></a></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>观看笔记：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ZD4y1t7sk?p=1&vd_source=2e1f2e416b0d46638abe76ab93b87e67">Clean Code</a>（整洁代码）Bob大叔现场演讲合集 - Bob大叔激情四射的演讲 让你重拾对编程的热情，对代码的执着。</p>
+<h1 id="理念"><a href="#理念" class="headerlink" title="理念"></a>理念</h1><ol>
+<li>写代码是给需要理解的人看的。</li>
+<li>clean code走的慢，但是走的好，走的好才能走的远。</li>
+</ol>
+<h1 id="代码规范"><a href="#代码规范" class="headerlink" title="代码规范"></a>代码规范</h1><ol>
+<li>代码扁平化。</li>
+<li>一个函数最好在一个屏幕内写完。</li>
+<li>同一个函数内容抽象层次相同。</li>
+<li>金字塔语义设计，标题、摘要、详情。</li>
+<li>一个函数只做一件事。即不能从中再抽象出更多的事情。</li>
+<li>函数参数不超过3个。</li>
+<li>函数传参不要传入bool。</li>
+<li>纵向阅读时不需要往回看。</li>
+<li>不要使用switch。因为当添加一个新的开关时，所有相关switch都需要改。用多态替代实现，将处理函数写在新增的类中。switch创建的依赖较多，重新编译时要更新更多的模块。</li>
+<li>有副作用的函数：调用会改变系统状态，如new，delete，open、close。通常成对出现。利用lamada传入函数的方式，将副作用成对的函数放在一起调用。所以有返回值的函数不应该存在副作用。</li>
+<li>try在函数中占全文，不应在try的外面写另外的语句。（一个函数只做一件事）</li>
+<li>避免重复。需要遍历处理时，抽象出一个遍历函数，利用lamada传入处理函数。</li>
+<li>每行最好最多在50～100个字符。</li>
+<li>变量名称长度与作用域大小成正比。函数名长度与作用域大小成反比。</li>
+<li>info、data名称歧义混淆。</li>
+</ol>
+<h1 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h1><p>注释是用来表达代码本身未能表达的意思。每个注释都意味着一次失败。</p>
+<ol>
+<li>尽量用函数名替代注释，除非函数名应用到了某些设计模式。</li>
+<li>正则表达式例子。</li>
+<li>单元测试命名的开关。</li>
+<li>一些这样写作的原因。 </li>
+<li>不要谈论不在注释处的代码。</li>
+</ol>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><ol>
+<li>发布代码时，确保代码整洁、高效、可运行、测试过的，了解其工作流程。</li>
+<li>software，软+件，灵活易改变的产品，敏捷首先要求充分低耦合的设计。</li>
+<li>代码应该随着时间的推移越来越好而不是屎山。</li>
+<li>为自己写的代码写单元测试，测试自己写的每一行代码。</li>
+<li>测试是系统设计的一部分，将测试与系统解耦。</li>
+<li>测试人员应该一无所获。</li>
+<li>尽可能自动化测试，手动测试总是会忽略某些测试。</li>
+<li>互相理解同事的代码，定期交流（面对面比只code review高效），当有些人临时不在时，可以互相“掩护”。</li>
+<li>估时很难定。给出三个时间点，最好情况（纯工作时常）、一般情况（各种事情穿插）、最差情况。</li>
+</ol>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-11-15");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-11-15T14:25:33.000Z" itemprop="datePublished">2022-11-15</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/clean-code/" rel="tag">#&nbsp;clean code</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/27/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">浏览器缓存</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

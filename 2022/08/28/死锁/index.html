@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>死锁 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="死锁 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/"><meta property="og:locale" content="zh-CN"><meta name="description" content="如果一个进程集合中的每个进程都在等待只能由该进程集合中的其他进程才能引发的事件，那么，该进程集合就是死锁的。 死锁条件死锁发生时，以下四个条件一定同时满足，如果其中任何一个条件不成立，死锁就不会发生：  互斥条件。每个资源要么已经分配给了一个进程，要么就是可用的。 占有和等待条件。已经得到了某个资源的进程可以再请求新的资源。 不可抢占条件。已经分配给一个进程的资源不能强制性地被抢占，它只能被占有它 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="操作系统, 死锁"><meta property="og:image" content="http://example.com/assets/images/%E6%AD%BB%E9%94%811.png"><meta property="og:image" content="http://example.com/assets/images/%E6%AD%BB%E9%94%812.png"><meta property="og:image" content="http://example.com/assets/images/%E6%AD%BB%E9%94%813.png"><meta property="og:image" content="http://example.com/assets/images/%E6%AD%BB%E9%94%814.png"><meta property="article:published_time" content="2022-08-28T06:33:33.000Z"><meta property="article:modified_time" content="2022-08-28T08:19:24.131Z"><meta property="og:updated_time" content="2022-08-28T08:19:24.131Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="操作系统, 死锁"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/"
+    },
+    "headline": "死锁 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-08-28T06:33:33.000Z",
+    "dateModified": "2022-08-28T08:19:24.131Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "操作系统, 死锁",
+    "description": "如果一个进程集合中的每个进程都在等待只能由该进程集合中的其他进程才能引发的事件，那么，该进程集合就是死锁的。 死锁条件死锁发生时，以下四个条件一定同时满足，如果其中任何一个条件不成立，死锁就不会发生：  互斥条件。每个资源要么已经分配给了一个进程，要么就是可用的。 占有和等待条件。已经得到了某个资源的进程可以再请求新的资源。 不可抢占条件。已经分配给一个进程的资源不能强制性地被抢占，它只能被占有它 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=死锁" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=死锁&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=死锁" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAAAAABQV18IAAAB6ElEQVR42u3bQQ7CMAxE0d7/0rCtUOwZt0WK3d8NiwJ5SG5iO+H4bHgdoECBArVAHcl1vr96v3PfHQfULNQy6H4GKgftAiXHATUKtQpgFdjRvWUQi3FAvQe1ep8bvO6PBPU+VLb4Rq/qHqj5qCxYsyRNPQTRg3MrSwC1Paoy4J3XR6sZUNuiqoVANAlGk+Zfuy6gtkRlSV02gCo2VVJoZwmg2qGc5O1K0EeFawoFNRLlNDyyH5M1PKIkANRMVLbIukVB1vxQzTRQM1HqC5zmRTZxRt8HaibKCejVhBkt2E5RUZ7RQbVAqcReJXcZVi3eVicPVDtUVkC4E6oT9NYmN6gRqGrB+USgh4szqBEot0BQSb/T0JebmqBGoKKFN2tWVA7iZEEPai5KHbxxN7fdZmw4FqhRqEqDIys83YM31mEJUC1RqjGhEn51aNX5PKhZKGdjKJo4VaJXPewFagbKado7D4XCKhCoOSi1qe1udFceELtwANUS5TRSrzbBnMNfsjsMqh3KOdDswNymrf3HC1CtUW6RoDDl4vPqjgOoFqg0AEXB4GwIlLsuoEaj3AegeqhC7jiAGomqHM5ymrR2NQOqPUoVDG4Do7oZfjlLALU1ShUOVmO+MFHKQ/KgWqN2ukCBAgXqdH0BbhO/Dk2okDgAAAAASUVORK5CYII=" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">死锁</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-08-28</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=死锁&url=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=死锁&url=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/08/28/%E6%AD%BB%E9%94%81/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAAAAABQV18IAAAB6ElEQVR42u3bQQ7CMAxE0d7/0rCtUOwZt0WK3d8NiwJ5SG5iO+H4bHgdoECBArVAHcl1vr96v3PfHQfULNQy6H4GKgftAiXHATUKtQpgFdjRvWUQi3FAvQe1ep8bvO6PBPU+VLb4Rq/qHqj5qCxYsyRNPQTRg3MrSwC1Paoy4J3XR6sZUNuiqoVANAlGk+Zfuy6gtkRlSV02gCo2VVJoZwmg2qGc5O1K0EeFawoFNRLlNDyyH5M1PKIkANRMVLbIukVB1vxQzTRQM1HqC5zmRTZxRt8HaibKCejVhBkt2E5RUZ7RQbVAqcReJXcZVi3eVicPVDtUVkC4E6oT9NYmN6gRqGrB+USgh4szqBEot0BQSb/T0JebmqBGoKKFN2tWVA7iZEEPai5KHbxxN7fdZmw4FqhRqEqDIys83YM31mEJUC1RqjGhEn51aNX5PKhZKGdjKJo4VaJXPewFagbKado7D4XCKhCoOSi1qe1udFceELtwANUS5TRSrzbBnMNfsjsMqh3KOdDswNymrf3HC1CtUW6RoDDl4vPqjgOoFqg0AEXB4GwIlLsuoEaj3AegeqhC7jiAGomqHM5ymrR2NQOqPUoVDG4Do7oZfjlLALU1ShUOVmO+MFHKQ/KgWqN2ukCBAgXqdH0BbhO/Dk2okDgAAAAASUVORK5CYII=" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E6%9D%A1%E4%BB%B6"><span class="post-toc-number">1.</span> <span class="post-toc-text">死锁条件</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%A4%84%E7%90%86%E6%AD%BB%E9%94%81%E7%AD%96%E7%95%A5"><span class="post-toc-number">2.</span> <span class="post-toc-text">处理死锁策略</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%B8%B5%E9%B8%9F%E7%AE%97%E6%B3%95"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">鸵鸟算法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E6%A3%80%E6%B5%8B"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">死锁检测</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%9A%E7%B1%BB%E5%9E%8B%E5%8D%95%E8%B5%84%E6%BA%90%E6%AD%BB%E9%94%81%E6%A3%80%E6%B5%8B"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">多类型单资源死锁检测</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%9A%E7%B1%BB%E5%9E%8B%E5%A4%9A%E8%B5%84%E6%BA%90%E6%AD%BB%E9%94%81%E6%A3%80%E6%B5%8B"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">多类型多资源死锁检测</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E6%81%A2%E5%A4%8D"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">死锁恢复</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8A%A2%E5%8D%A0%E6%81%A2%E5%A4%8D"><span class="post-toc-number">2.3.1.</span> <span class="post-toc-text">抢占恢复</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%9E%E6%BB%9A%E6%81%A2%E5%A4%8D"><span class="post-toc-number">2.3.2.</span> <span class="post-toc-text">回滚恢复</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9D%80%E6%AD%BB%E8%BF%9B%E7%A8%8B"><span class="post-toc-number">2.3.3.</span> <span class="post-toc-text">杀死进程</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E9%81%BF%E5%85%8D"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">死锁避免</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%89%E5%85%A8%E7%8A%B6%E6%80%81%E5%92%8C%E4%B8%8D%E5%AE%89%E5%85%A8%E7%8A%B6%E6%80%81"><span class="post-toc-number">2.4.1.</span> <span class="post-toc-text">安全状态和不安全状态</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%B5%84%E6%BA%90%E8%BD%A8%E8%BF%B9%E5%9B%BE"><span class="post-toc-number">2.4.2.</span> <span class="post-toc-text">资源轨迹图</span></a></li></ol></li></ol></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <p>如果一个进程集合中的每个进程都在等待只能由该进程集合中的其他进程才能引发的事件，那么，该进程集合就是死锁的。</p>
+<h1 id="死锁条件"><a href="#死锁条件" class="headerlink" title="死锁条件"></a>死锁条件</h1><p>死锁发生时，以下四个条件一定同时满足，如果其中任何一个条件不成立，死锁就不会发生：</p>
+<ol>
+<li>互斥条件。每个资源要么已经分配给了一个进程，要么就是可用的。</li>
+<li>占有和等待条件。已经得到了某个资源的进程可以再请求新的资源。</li>
+<li>不可抢占条件。已经分配给一个进程的资源不能强制性地被抢占，它只能被占有它的进程显式地释放。</li>
+<li>环路等待条件。死锁发生时，系统中一定有由两个或两个以上的进程组成的一条环路，该环路中的每个进程都在等待着下一个进程所占有的资源。</li>
+</ol>
+<h1 id="处理死锁策略"><a href="#处理死锁策略" class="headerlink" title="处理死锁策略"></a>处理死锁策略</h1><h2 id="鸵鸟算法"><a href="#鸵鸟算法" class="headerlink" title="鸵鸟算法"></a>鸵鸟算法</h2><p>忽略，假装没有死锁问题。考虑解决死锁的代价、死锁发生的频度、系统因各种原因崩溃而重启的次数、死锁的后果等综合因素，不管也许没什么问题。如果死锁平均每5年发生一次，而每个月系统都会因硬件故障、编译器错误或者操作系统故障而崩溃一次，那么大多数的工程师不会以性能损失和可用性的代价去防止死锁。</p>
+<h2 id="死锁检测"><a href="#死锁检测" class="headerlink" title="死锁检测"></a>死锁检测</h2><h3 id="多类型单资源死锁检测"><a href="#多类型单资源死锁检测" class="headerlink" title="多类型单资源死锁检测"></a>多类型单资源死锁检测</h3><p>最简单的情况即每种类型只有一个资源。这样的系统可能有一台扫描仪、一台CD刻录机、一台绘图仪和一台磁带机，但每种类型的资源都不超过一个，即暂时排除了同时有两台打印机的情况。<br>那么其实就可以抽象成一张资源分配图（单向图），假设一个系统包括A到G共7个进程，R到W共6种资源。资源的占有情况和进程对资源的请求情况如下：</p>
+<ol>
+<li>A进程持有R资源，且需要S资源。</li>
+<li>B进程不持有任何资源，但需要T资源。</li>
+<li>C进程不持有任何资源，但需要S资源。</li>
+<li>D进程持有U资源，且需要S资源和T资源。</li>
+<li>E进程持有T资源，且需要V资源。</li>
+<li>F进程持有W资源，且需要S资源。</li>
+<li>G进程持有V资源，且需要U资源。</li>
+</ol>
+<p><img src="/../assets/images/%E6%AD%BB%E9%94%811.png" alt="死锁资源分配图"></p>
+<p>显然，可将单资源的死锁检测当作单向图的环路检测，即对每一个节点当作一个树的根节点进行深度优先搜索。</p>
+<h3 id="多类型多资源死锁检测"><a href="#多类型多资源死锁检测" class="headerlink" title="多类型多资源死锁检测"></a>多类型多资源死锁检测</h3><p>当有多种相同的资源存在，就需要采用一种矩阵的方式来检测死锁，如下图所示：</p>
+<p><img src="/../assets/images/%E6%AD%BB%E9%94%812.png" alt="矩阵方法死锁检测"></p>
+<p>主体由两个矩阵构成，一个是当前分配矩阵C(n x m)，一个是请求矩阵R(n x m)，其中n表示进程数，m表示资源类型数，Cij即表示第i个进程已占有Cij个j资源，Rij表示第i个进程一共需要Rij个j资源。E(1 x m)表示每个资源的总数，A(1 x m)表示当前状态下每种资源剩余的数量。</p>
+<p>因此死锁检测的基本思路是，根据当前资源剩余数量找到一个进程，使得可以满足该进程所有所需资源，并假设该进程运行完毕将之前占有的资源返还给资源池中。然后继续利用剩余资源池寻找下一个满足条件的进程，直到找不到满足条件的进程。剩余未被找到的进程则处于死锁当中。</p>
+<p>比如下图的情况不存在死锁。由于当前剩余的A&#x3D;(2 1 0 0)，不能够满足进程1的(2 0 0 1)和进程2的(1 0 1 0)，但是可以满足进程3(2 1 0 0)，于是假设进程3运行完毕，将资源返还的资源池中，则A&#x3D;(2 2 2 0)。接着剩余资源则可满足进程2，然后满足进程1，于是不存在死锁。</p>
+<p>如果将图中的R2改成(2 1 0 1)，则不能满足所有进程，会出现死锁。<br><img src="/../assets/images/%E6%AD%BB%E9%94%813.png" alt="矩阵方法死锁检测例子"></p>
+<h2 id="死锁恢复"><a href="#死锁恢复" class="headerlink" title="死锁恢复"></a>死锁恢复</h2><h3 id="抢占恢复"><a href="#抢占恢复" class="headerlink" title="抢占恢复"></a>抢占恢复</h3><p>在不通知原进程的情况下，将某一资源从一个进程强行取走给另一个进程使用，接着又送回。比如将激光打印机从它的持有进程那里拿走用作其他事项，然后将该进程挂起，待归还时在将该进程恢复。<br>这种做法是否可行主要取决于该资源本身的特性。用这种方法恢复通常比较困难或者说不太可能。若选择挂起某个进程，则在很大程度上取决于哪一个进程拥有比较容易收回的资源。</p>
+<h3 id="回滚恢复"><a href="#回滚恢复" class="headerlink" title="回滚恢复"></a>回滚恢复</h3><p>周期性的进行状态快照和检查点保存。进程检查点检查就是将进程的状态写入一个文件以备以后重启。该检查点中不仅包括存储映像，还包括了资源状态，即哪些资源分配给了该进程。为了使这一过程更有效，新的检查点不应覆盖原有的文件，而应写到新文件中。这样，当进程执行时，将会有一系列的检查点文件被累积起来。</p>
+<p>一旦检测到死锁，就很容易发现需要哪些资源。为了进行恢复，要从一个较早的检查点上开始，这样拥有所需要资源的进程会回滚到一个时间点，在此时间点之前该进程获得了一些其他的资源。在该检查点后所做的所有工作都丢失。</p>
+<h3 id="杀死进程"><a href="#杀死进程" class="headerlink" title="杀死进程"></a>杀死进程</h3><p>最直接也是最简单的解决死锁的方法是杀死一个或若干个进程。杀死进程的选取也很讲究，如何找到代价最小的被进程的集合也是一个难题，包括最小杀死进程的数量以及杀死各个进程的代价等。</p>
+<p>另一方面，最好杀死可以从头开始重新运行而且不会带来副作用的进程。比如，编译进程可以被重复运行，由于它只需要读入一个源文件和产生一个目标文件。如果将它中途杀死，它的第一次运行不会影响到第二次运行。而更新数据库的进程在第二次运行时并非总是安全的。如果一个进程将数据库的某个记录加1，那么运行它一次，将它杀死后，再次执行，就会对该记录加2，显然是错误的。</p>
+<h2 id="死锁避免"><a href="#死锁避免" class="headerlink" title="死锁避免"></a>死锁避免</h2><h3 id="安全状态和不安全状态"><a href="#安全状态和不安全状态" class="headerlink" title="安全状态和不安全状态"></a>安全状态和不安全状态</h3><p>接着多类型多资源的死锁检测，如果检测不到死锁则称当前的状态为安全状态，如果检测到死锁则称该状态为不安全状态。</p>
+<p>银行家算法则是对于每个资源请求进行判断，如果当前的请求将会从安全状态转移到不安全状态，则不予以分配资源，如果仍旧是安全状态则允许分配。</p>
+<h3 id="资源轨迹图"><a href="#资源轨迹图" class="headerlink" title="资源轨迹图"></a>资源轨迹图</h3><p>避免死锁的主要算法是基于一个安全状态的概念。</p>
+<p><img src="/../assets/images/%E6%AD%BB%E9%94%814.png" alt="矩阵方法死锁检测例子"></p>
+<p>如图所示中，我们看到一个处理两个进程和两种资源（打印机和绘图仪）的模型。横轴表示进程A执行的指令，纵轴表示进程B执行的指令。进程A在I1 处请求一台打印机，在I3 处释放，在I2 处请求一台绘图仪，在I4 处释放。进程B在I5 到I7 之间需要绘图仪，在I6 到I8 之间需要打印机。</p>
+<p>图6-8中的每一点都表示出两个进程的连接状态。初始点为p，没有进程执行任何指令。如果调度程序选中A先运行，那么在A执行一段指令后到达q，此时B没有执行任何指令。在q点，如果轨迹沿垂直方向移动，表示调度程序选中B运行。在单处理机情况下，所有路径都只能是水平或垂直方向的，不会出现斜向的。因此，运动方向一定是向上或向右，不会向左或向下，因为进程的执行不可能后退。</p>
+<p>当进程A由r向s移动穿过I1 线时，它请求并获得打印机。当进程B到达t时，它请求绘图仪。</p>
+<p>图中的阴影部分是我们感兴趣的，画着从左下到右上斜线的部分表示在该区域中两个进程都拥有打印机，而互斥使用的规则决定了不可能进入该区域。另一种斜线的区域表示两个进程都拥有绘图仪，且同样不可进入。</p>
+<p>如果系统一旦进入由I1 、I2 和I5 、I6 组成的矩形区域，那么最后一定会到达I2 和I6 的交叉点，这时就产生死锁。在该点处，A请求绘图仪，B请求打印机，而且这两种资源均已被分配。这整个矩形区域都是不安全的，因此决不能进入这个区域。在点t处惟一的办法是运行进程A直到I4 ，过了I4 后，可以按任何路线前进，直到终点u。</p>
+<p>需要注意的是，在点t进程B请求资源。系统必须决定是否分配。如果系统把资源分配给B，系统进入不安全区域，最终形成死锁。要避免死锁，应该将B挂起，直到A请求并释放绘图仪。</p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-08-28");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-08-28T06:33:33.000Z" itemprop="datePublished">2022-08-28</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#&nbsp;操作系统</a>
+
+<a class="post-tags-list-item" href="/tags/%E6%AD%BB%E9%94%81/" rel="tag">#&nbsp;死锁</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">函数柯里化</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">用户空间线程与内核线程</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

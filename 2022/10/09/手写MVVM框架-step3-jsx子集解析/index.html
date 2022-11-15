@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step3-jsx子集解析 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step3-jsx子集解析 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/"><meta property="og:locale" content="zh-CN"><meta name="description" content="问题定义接下来的任务是解析HTML文本中的jsx代码，生成js运行后的文本，然后再进入正常的渲染流程。即实现一个函数resolveJsx，输入原始文本str和所需变量jsxProps，实现将样例文本如下进行转换： 123456function resolveJsx(str, jsxProps) &amp;#123;    &#x2F;&#x2F; code&amp;#125;let test &#x3D; &#96;&amp;lt;div&amp;gt; 姓名：&amp;# - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, MVVM, vue, react, jsx, 沙箱"><meta property="og:image" content="http://example.com/assets/images/MVVM-step3.jpg"><meta property="article:published_time" content="2022-10-09T14:01:03.000Z"><meta property="article:modified_time" content="2022-10-09T16:22:52.293Z"><meta property="og:updated_time" content="2022-10-09T16:22:52.293Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, MVVM, vue, react, jsx, 沙箱"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/"
+    },
+    "headline": "手写MVVM框架-step3-jsx子集解析 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-09T14:01:03.000Z",
+    "dateModified": "2022-10-09T16:22:52.293Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, MVVM, vue, react, jsx, 沙箱",
+    "description": "问题定义接下来的任务是解析HTML文本中的jsx代码，生成js运行后的文本，然后再进入正常的渲染流程。即实现一个函数resolveJsx，输入原始文本str和所需变量jsxProps，实现将样例文本如下进行转换： 123456function resolveJsx(str, jsxProps) &amp;amp;#123;    // code&amp;amp;#125;let test = `&amp;amp;lt;div&amp;amp;gt; 姓名：&amp;amp;# - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step3-jsx子集解析" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step3-jsx子集解析&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step3-jsx子集解析" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMQAAADECAAAAADlzdG3AAADO0lEQVR42u3a204DMQxF0f7/T8MTElSJz3Yac9PuCzCUaRaSx4ntx9s/eD1EiBAhQsQ44lG8nn//8fPn66trz9ef3//8N18WtrjXal0iREwilkETru8WWMFW91zB6LpEiJhEpKDcvb8Kyh1q9VBJn7N8jwgRP4CoFrQKulVSqxb+UgIVIeKHEDSo00aSJEMRIn4LotropQXsAjZtAHebwuu7WBEimojTgJz+erXaIUIERMSiLfiQKiCr4sCuUHe9Ki5CRLM/cfIB1WGnCsa0kaw2hThjixDxIoIe3DuvtAmsFkk2liJETCJS06RKQJ2FkCYkKViLEDGJSAd0koxSkuo0Y1pNSBEiBhDVIlKQdoM1bTITIj6dRIi4gNgFbQpI0oCsMHQDWB6eRIgYQpBmOF1IKn6lw1GnkCZCxCSCDBR2isgpWZFrcSMpQsQQokpopBlIgJ3EmK6LEDGNIEWu0yIZbcik5sryPiJEDCDS8GA5SAibirTBkga6ymqHCBEDiFTIJU3G7j1P3yNCxCSiM2SSDizk4J++JwOVIkRMIboNkW7jPg1fdf9ehIhpRAogchDqfE0HrlTQRpNnIkS8gKDFYpLYOoMmnSFIPLQlQsQFRGdQt1M8IPehG8BYUBYh4iKCHMhTsZkU3sihiBQoUONRhIgLiE7gkUEu+oA4acaIEDGJIDdKRbNOUawzNBkPViJEDCA6A1SpCZKSJSqIwcamCBFTCBKoaRCFBC8ZTkyNzFYFUISIQ8SNhdMNIUlwpEEjQsQ0IiWqdMNUWEhFYjLUiKriIkRcQHSaK93gq5IoLRq0mywiRFxAvHJ4J0WBbiMnfbYIEZOIXbJLRTV0kG8Uh6v1HG8ARYg4RJwkrLTgKnGmwgH+TBEiBhBV0qJDh9U/pFOUQ81GESKGETTZkOZL59BEhmDiQ0eEiAFEd8CKFKJTgksNlbTxFCFiGkEKyySxkeLxSaNl+5ARIWIQUQUmLWyRh0RqxqTiWhnYIkR8AyImnIPiMS0o42a8CBHfjDhtsJPDTipqtxqPIkRcRJBBFRqY5B9SJVD8UBEhYghBCgWkCFAF9MmgVgSKEDGA+MsvESJEiBAx9noHz80BjpDg+NIAAAAASUVORK5CYII=" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step3-jsx子集解析</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-09</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step3-jsx子集解析&url=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step3-jsx子集解析&url=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMQAAADECAAAAADlzdG3AAADO0lEQVR42u3a204DMQxF0f7/T8MTElSJz3Yac9PuCzCUaRaSx4ntx9s/eD1EiBAhQsQ44lG8nn//8fPn66trz9ef3//8N18WtrjXal0iREwilkETru8WWMFW91zB6LpEiJhEpKDcvb8Kyh1q9VBJn7N8jwgRP4CoFrQKulVSqxb+UgIVIeKHEDSo00aSJEMRIn4LotropQXsAjZtAHebwuu7WBEimojTgJz+erXaIUIERMSiLfiQKiCr4sCuUHe9Ki5CRLM/cfIB1WGnCsa0kaw2hThjixDxIoIe3DuvtAmsFkk2liJETCJS06RKQJ2FkCYkKViLEDGJSAd0koxSkuo0Y1pNSBEiBhDVIlKQdoM1bTITIj6dRIi4gNgFbQpI0oCsMHQDWB6eRIgYQpBmOF1IKn6lw1GnkCZCxCSCDBR2isgpWZFrcSMpQsQQokpopBlIgJ3EmK6LEDGNIEWu0yIZbcik5sryPiJEDCDS8GA5SAibirTBkga6ymqHCBEDiFTIJU3G7j1P3yNCxCSiM2SSDizk4J++JwOVIkRMIboNkW7jPg1fdf9ehIhpRAogchDqfE0HrlTQRpNnIkS8gKDFYpLYOoMmnSFIPLQlQsQFRGdQt1M8IPehG8BYUBYh4iKCHMhTsZkU3sihiBQoUONRhIgLiE7gkUEu+oA4acaIEDGJIDdKRbNOUawzNBkPViJEDCA6A1SpCZKSJSqIwcamCBFTCBKoaRCFBC8ZTkyNzFYFUISIQ8SNhdMNIUlwpEEjQsQ0IiWqdMNUWEhFYjLUiKriIkRcQHSaK93gq5IoLRq0mywiRFxAvHJ4J0WBbiMnfbYIEZOIXbJLRTV0kG8Uh6v1HG8ARYg4RJwkrLTgKnGmwgH+TBEiBhBV0qJDh9U/pFOUQ81GESKGETTZkOZL59BEhmDiQ0eEiAFEd8CKFKJTgksNlbTxFCFiGkEKyySxkeLxSaNl+5ARIWIQUQUmLWyRh0RqxqTiWhnYIkR8AyImnIPiMS0o42a8CBHfjDhtsJPDTipqtxqPIkRcRJBBFRqY5B9SJVD8UBEhYghBCgWkCFAF9MmgVgSKEDGA+MsvESJEiBAx9noHz80BjpDg+NIAAAAASUVORK5CYII=" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题定义</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="post-toc-number">2.</span> <span class="post-toc-text">解决方案</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#with%E5%AE%9E%E7%8E%B0%E6%B2%99%E7%AE%B1%E8%A7%A3%E6%9E%90jsx"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">with实现沙箱解析jsx</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#iframe%E5%AE%9E%E7%8E%B0%E6%B2%99%E7%AE%B1"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">iframe实现沙箱</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">3.</span> <span class="post-toc-text">测试</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">结果</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">一些问题</span></a></li></ol></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><p>接下来的任务是解析HTML文本中的jsx代码，生成js运行后的文本，然后再进入正常的渲染流程。即实现一个函数resolveJsx，输入原始文本str和所需变量jsxProps，实现将样例文本如下进行转换：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">resolveJsx</span>(<span class="params">str, jsxProps</span>) &#123;</span><br><span class="line">    <span class="comment">// code</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> test = <span class="string">`&lt;div&gt; 姓名：&#123;&#123; name ? name : &#x27;none&#x27; &#125;&#125; &lt;/div&gt;`</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">resolveJsx</span>(test, &#123;<span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span>&#125;); <span class="comment">// =&gt; `&lt;div&gt; 姓名：lzh &lt;/div&gt;`</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>首先通过正则匹配，将两个大括号中的内容取出来：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> matched = str.<span class="title function_">match</span>(<span class="regexp">/\&#123;\&#123;[^\&#123;\&#125;]+&#125;\&#125;/g</span>);</span><br><span class="line"><span class="keyword">if</span> (matched) &#123;</span><br><span class="line">    matched.<span class="title function_">forEach</span>(<span class="function"><span class="params">code</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 去掉两边的两个大括号&#123;&#123;&#125;&#125;运行</span></span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(code.<span class="title function_">slice</span>(<span class="number">2</span>, code.<span class="property">length</span> - <span class="number">2</span>));</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到其中的内容之后，将其当作js文本执行得到结果。直觉上讲可以使用eval运行js得到结果，但是如何将其中用到的变量对应到jsxProps中是一个问题。</p>
+<p>在计算机安全中，沙箱（Sandbox）是一种用于隔离正在运行程序的安全机制，通常用于执行未经测试或不受信任的程序或代码，它会为待执行的程序创建一个独立的执行环境，内部程序的执行不会影响到外部程序的运行。</p>
+<p>简单来讲，沙箱这个概念应用于JavaScript时，就是创建一个新的运行环境来运行指定js代码，我们可以通过创建一个沙箱来执行其中的js文本，并且可以提前设置环境中的预制变量，从而应用jsxProps中的变量。沙箱的具体内容可参照如下：<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/428039764">浅析 JavaScript 沙箱机制</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/7146973901166215176#heading-71">沙箱</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6991025700077568030">实现 JavaScript 沙箱的几种方式</a></p>
+<h2 id="with实现沙箱解析jsx"><a href="#with实现沙箱解析jsx" class="headerlink" title="with实现沙箱解析jsx"></a>with实现沙箱解析jsx</h2><p>在非严格模式下，可以通过with改变指定代码块下的作用域，即with语句是将某个对象添加到作用域链的顶部，最简单的示例比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 执行上下文对象</span></span><br><span class="line"><span class="keyword">const</span> ctx = &#123;</span><br><span class="line">    <span class="attr">func</span>: <span class="function"><span class="params">variable</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(variable)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">foo</span>: <span class="string">&#x27;foo&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">sandbox</span>(<span class="params">code, ctx</span>) &#123;</span><br><span class="line">    <span class="title function_">with</span>(<span class="params">ctx</span>) &#123; <span class="comment">// Add with</span></span><br><span class="line">        <span class="built_in">eval</span>(code)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 待执行程序</span></span><br><span class="line"><span class="keyword">const</span> code = <span class="string">`</span></span><br><span class="line"><span class="string">    foo = &#x27;bar&#x27;</span></span><br><span class="line"><span class="string">    func(foo)</span></span><br><span class="line"><span class="string">`</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">sandbox</span>(code, ctx) <span class="comment">// bar</span></span><br></pre></td></tr></table></figure>
+
+<p>所以可以将resolveJsx简单实现如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">resolveJsx</span>(<span class="params">str, jsxProps</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> matched = str.<span class="title function_">match</span>(<span class="regexp">/\&#123;\&#123;[^\&#123;\&#125;]+&#125;\&#125;/g</span>);</span><br><span class="line">    <span class="keyword">if</span> (matched) &#123;</span><br><span class="line">        matched.<span class="title function_">forEach</span>(<span class="function"><span class="params">code</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">let</span> res;</span><br><span class="line">            <span class="comment">// 作用域修改为jsxProps</span></span><br><span class="line">            <span class="comment">// 即创建一个运行环境，其中jsxProps属性均为环境中已有的变量</span></span><br><span class="line">            <span class="title function_">with</span>(<span class="params">jsxProps</span>) &#123;</span><br><span class="line">                <span class="comment">// 去掉两边的两个大括号&#123;&#123;&#125;&#125;运行</span></span><br><span class="line">                res = <span class="built_in">eval</span>(code.<span class="title function_">slice</span>(<span class="number">2</span>, code.<span class="property">length</span> - <span class="number">2</span>))</span><br><span class="line">            &#125;</span><br><span class="line">            str = str.<span class="title function_">replace</span>(code, res);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> str;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样会有作用域链仍旧向上查找的问题，解决方案可参照上面的参考链接，通过Proxy对访问进行过滤。</p>
+<h2 id="iframe实现沙箱"><a href="#iframe实现沙箱" class="headerlink" title="iframe实现沙箱"></a>iframe实现沙箱</h2><p>但是with仅限在非严格模式下使用，因为考虑到es6 module的使用，会默认启用严格模式，所以这里采用iframe创建一个运行环境来执行。大体思路类似，首先利用iframe创建一个contentWindow，然后将jsxProps中的属性都定义在contentWindow环境中，然后在该环境运行js代码得到结果：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将str中的jsx语句转化为运行后的结果值</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">resolveJsx</span>(<span class="params">str, jsxProps</span>) &#123;</span><br><span class="line">    <span class="comment">// 创建iframe沙箱</span></span><br><span class="line">    <span class="keyword">let</span> iframe = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;iframe&#x27;</span>, &#123; <span class="attr">url</span>: <span class="string">&#x27;about:blank&#x27;</span> &#125;);</span><br><span class="line">    iframe.<span class="property">style</span>.<span class="property">display</span> = <span class="string">&#x27;none&#x27;</span>;</span><br><span class="line">    <span class="comment">// 限制iframe代码执行能力</span></span><br><span class="line">    iframe.<span class="property">sandbox</span> = <span class="string">&#x27;allow-same-origin&#x27;</span>;</span><br><span class="line">    <span class="comment">// 添加到dom树中，否则contentWindow为空</span></span><br><span class="line">    <span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">appendChild</span>(iframe);</span><br><span class="line">    <span class="comment">// 将jsxProps中的变量拷贝到iframe的运行环境中，调用ctx.eval()即可运行js代码</span></span><br><span class="line">    <span class="keyword">let</span> ctx = <span class="title class_">Object</span>.<span class="title function_">assign</span>(iframe.<span class="property">contentWindow</span>, jsxProps);</span><br><span class="line">    <span class="keyword">let</span> matched = str.<span class="title function_">match</span>(<span class="regexp">/\&#123;\&#123;[^\&#123;\&#125;]+&#125;\&#125;/g</span>);</span><br><span class="line">    <span class="keyword">if</span> (matched) &#123;</span><br><span class="line">        matched.<span class="title function_">forEach</span>(<span class="function"><span class="params">code</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 去掉两边的两个大括号&#123;&#123;&#125;&#125;运行</span></span><br><span class="line">            <span class="keyword">let</span> res = ctx.<span class="built_in">eval</span>(code.<span class="title function_">slice</span>(<span class="number">2</span>, code.<span class="property">length</span> - <span class="number">2</span>));</span><br><span class="line">            <span class="comment">// 替换原文本</span></span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(code, res);</span><br><span class="line">            str = str.<span class="title function_">replace</span>(code, res);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">removeChild</span>(iframe);</span><br><span class="line">    <span class="keyword">return</span> str;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后只需要在之前的trans函数添加jsxProps参数输入，并且在解析value和HTML标签属性的地方对文本进行替换即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">trans</span>(<span class="params">template, jsxProps = &#123;&#125;</span>) &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">let</span> value = template.<span class="title function_">slice</span>(valueIdx, idx).<span class="title function_">trim</span>();</span><br><span class="line">    <span class="keyword">if</span> (value) &#123;</span><br><span class="line">        <span class="comment">// 解析jsx文本</span></span><br><span class="line">        value = <span class="title function_">resolveJsx</span>(value, jsxProps);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">let</span> tagContent = template.<span class="title function_">slice</span>(idx + <span class="number">1</span>, end - <span class="number">1</span>).<span class="title function_">trim</span>();</span><br><span class="line">    <span class="comment">// 解析jsx文本</span></span><br><span class="line">    tagContent = <span class="title function_">resolveJsx</span>(tagContent, jsxProps);</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div style=&quot;background-color: red&quot; class = &quot;test&quot;&gt;</span></span><br><span class="line"><span class="string">        Hello World!</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            表格</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;姓 名：&#123;&#123; name ? name : &#x27;none&#x27; &#125;&#125;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;年 龄：&#123;&#123; age ? age : &#x27;none&#x27; &#125;&#125;&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> root = <span class="title function_">trans</span>(template, &#123; <span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span>, <span class="attr">age</span>: <span class="literal">null</span> &#125;);</span><br><span class="line"><span class="title function_">render</span>(root, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p><img src="/../assets/images/MVVM-step3.jpg" alt="运行结果"></p>
+<h2 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h2><ol>
+<li>目前还只是匹配了jsx的子集，对于js和HTML结合的语句和jsx嵌套未进行处理，主要瓶颈在于jsx文本的解析，比如：<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">    &#123;count &amp;&amp; <span class="language-xml"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Messages: &#123;count&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>&#125;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure></li>
+<li>对未找到props属性没有做特殊的异常处理，目前只是会报错在iframe中运行的错误，但是没有给出具体是因为框架哪里写的不对，报错异常显示不友好。</li>
+<li>iframe多次创建和删除问题。随着resolveJsx函数的多次调用，其中的iframe也频繁的创建和删除，会有一定的性能问题。可以通过单例模式创建iframe，每次运行时刷新环境变量，或者将iframe声明在trans函数作用域的头部以防止频繁创建和删除。</li>
+</ol>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-10");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-09T14:01:03.000Z" itemprop="datePublished">2022-10-09</time>
+
+    , 最后修改于&nbsp;<time datetime="2022-10-09T16:22:52.293Z" itemprop="dateModified">2022-10-10</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+<a class="post-tags-list-item" href="/tags/jsx/" rel="tag">#&nbsp;jsx</a>
+
+<a class="post-tags-list-item" href="/tags/%E6%B2%99%E7%AE%B1/" rel="tag">#&nbsp;沙箱</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step4-组件的抽象与更新</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step2-props解析和render</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

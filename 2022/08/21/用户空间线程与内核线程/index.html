@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>用户空间线程与内核线程 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="用户空间线程与内核线程 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/"><meta property="og:locale" content="zh-CN"><meta name="description" content="有两种主要实现线程的方法：在用户空间中和在内核中。这两种方法互有利弊，同时也有混合的实现方式。 用户空间中实现线程把整个线程包放在用户空间中，内核对线程包一无所知。从内核角度考虑，就是按正常的方式管理，即单线程进程。 优点 可以在仅支持进程的操作系统上使用线程。 线程切换代价小。当某个线程阻塞时，堆栈指针和程序计数器仅在用户空间中进行切换，不必陷入内核，对于内核来讲仍旧是当作一个进程来处理，故切换 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="操作系统, 进程, 线程, 内核进程, 用户空间进程"><meta property="og:image" content="http://example.com/assets/images/%E7%BA%BF%E7%A8%8B1.png"><meta property="article:published_time" content="2022-08-21T08:25:38.000Z"><meta property="article:modified_time" content="2022-08-28T07:04:46.302Z"><meta property="og:updated_time" content="2022-08-28T07:04:46.302Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="操作系统, 进程, 线程, 内核进程, 用户空间进程"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/"
+    },
+    "headline": "用户空间线程与内核线程 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-08-21T08:25:38.000Z",
+    "dateModified": "2022-08-28T07:04:46.302Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "操作系统, 进程, 线程, 内核进程, 用户空间进程",
+    "description": "有两种主要实现线程的方法：在用户空间中和在内核中。这两种方法互有利弊，同时也有混合的实现方式。 用户空间中实现线程把整个线程包放在用户空间中，内核对线程包一无所知。从内核角度考虑，就是按正常的方式管理，即单线程进程。 优点 可以在仅支持进程的操作系统上使用线程。 线程切换代价小。当某个线程阻塞时，堆栈指针和程序计数器仅在用户空间中进行切换，不必陷入内核，对于内核来讲仍旧是当作一个进程来处理，故切换 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=用户空间线程与内核线程" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=用户空间线程与内核线程&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=用户空间线程与内核线程" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADoElEQVR42u3a3Y7qMAxFYd7/pWduEWq8l8NP3WpxA0dnaPshxXFsP/5u+HqIEiVKlKjboR7F6/lvnt9fPx/93/N3Ov9e3Qc9pyhRQ1CHi+7lYhXu6KFWN369ZnXPo3uvviNK1DTU6iIUvXrIKgCkB189z+o7okRdCVVtvFVwWG3KFby6pyhRV0dVQSNtrt0NOAUdUaKuhKoSxVWCS5LgtJGuQNUh9O0sXZSoL6OqhT3p/WPVJFGivoiKRfeiqJI25rSxHhU1q6Dwsa6HKFFfRJGNtLt5kuBT3Tf9/TJJFiVqCIoUX9LC7xQdd5pxqYAjStQUFGkmpwWdipBV8YUEoVREFSVqGmq3OJkabyng0OIpHkoRJWoAaicRJejOtUnDOjXGRYmagqJDUGTBkmFI2hinzXNRoiaiyAAiDR708NjZpElQEiVqCooOEVabH2kWkKSWHlzRcIgoUSeiqs/VEFRa+CkJpc0AvFmLEjUE1TkE7gx2dBrjpKG+/JFEiRqMos1qsoF3YORg2M4oRIn6IYos2NQcI4GBNrxJI2G5UYsSNQhVJZDvLGZSTKl+JJoQiBI1CdUZyO0EkrRJd4umMbkVJWoIarUZkoJiGqLqbuqkAb7cpEWJGoLqDBpWC7hsMjcLnKlhLkrUZNROA7rbFNt5J4NYokRNQ6WDXKeAnxpxKSklB8uycCpK1BAUGUJsLdhGUryT2C4b3KJEDUGRQiMdRuyiKQYNZIkSNQCFhgNJwws0trvFUlJwESVqKoo2oavCDE08q+HEbsA4TGhFiToZRYqPpPnWOfyRwZD2wLAoUQNQ3xq0okGg04iLG7coUQNQpMHWTWBp0bIKMqnYg6KfKFEnocqie5HE0gQ1DVZRQAxsokQNQ3Ua2QSdEtlUgKGFUVGipqHIxeIBrXEA3Bl0RMUeUaIGoFCDGBzmtppkAVg9UxkoRIkagkoFlHcDB2lKpOuUhR5RogagSMOMDhvSwUVSGKXBInbnRYk6CUUXLh3aoIfBNBTSao6LEjUAVV0Ab3pguPidZgMphooSNQW1s4A7xREyvNVtTrSLmaJE/RCVFjXFVY0F2pSr7oOuJ0rUEBRNYjuDUSkJJj8gSWpFiZqK6ixYUmzsJLSdppwoUXdAdQuO6SDZORimACJK1BVR6fPOYDD9IVOSsCxmihJ1MmqnKVAt7t2GQwoq5Y8sStQQ1E4xP220nUVPG9qxUCNK1ADUnV6iRIkSJeo2r3/8goLf1sfydQAAAABJRU5ErkJggg==" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">用户空间线程与内核线程</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-08-21</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=用户空间线程与内核线程&url=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=用户空间线程与内核线程&url=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/08/21/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADoElEQVR42u3a3Y7qMAxFYd7/pWduEWq8l8NP3WpxA0dnaPshxXFsP/5u+HqIEiVKlKjboR7F6/lvnt9fPx/93/N3Ov9e3Qc9pyhRQ1CHi+7lYhXu6KFWN369ZnXPo3uvviNK1DTU6iIUvXrIKgCkB189z+o7okRdCVVtvFVwWG3KFby6pyhRV0dVQSNtrt0NOAUdUaKuhKoSxVWCS5LgtJGuQNUh9O0sXZSoL6OqhT3p/WPVJFGivoiKRfeiqJI25rSxHhU1q6Dwsa6HKFFfRJGNtLt5kuBT3Tf9/TJJFiVqCIoUX9LC7xQdd5pxqYAjStQUFGkmpwWdipBV8YUEoVREFSVqGmq3OJkabyng0OIpHkoRJWoAaicRJejOtUnDOjXGRYmagqJDUGTBkmFI2hinzXNRoiaiyAAiDR708NjZpElQEiVqCooOEVabH2kWkKSWHlzRcIgoUSeiqs/VEFRa+CkJpc0AvFmLEjUE1TkE7gx2dBrjpKG+/JFEiRqMos1qsoF3YORg2M4oRIn6IYos2NQcI4GBNrxJI2G5UYsSNQhVJZDvLGZSTKl+JJoQiBI1CdUZyO0EkrRJd4umMbkVJWoIarUZkoJiGqLqbuqkAb7cpEWJGoLqDBpWC7hsMjcLnKlhLkrUZNROA7rbFNt5J4NYokRNQ6WDXKeAnxpxKSklB8uycCpK1BAUGUJsLdhGUryT2C4b3KJEDUGRQiMdRuyiKQYNZIkSNQCFhgNJwws0trvFUlJwESVqKoo2oavCDE08q+HEbsA4TGhFiToZRYqPpPnWOfyRwZD2wLAoUQNQ3xq0okGg04iLG7coUQNQpMHWTWBp0bIKMqnYg6KfKFEnocqie5HE0gQ1DVZRQAxsokQNQ3Ua2QSdEtlUgKGFUVGipqHIxeIBrXEA3Bl0RMUeUaIGoFCDGBzmtppkAVg9UxkoRIkagkoFlHcDB2lKpOuUhR5RogagSMOMDhvSwUVSGKXBInbnRYk6CUUXLh3aoIfBNBTSao6LEjUAVV0Ab3pguPidZgMphooSNQW1s4A7xREyvNVtTrSLmaJE/RCVFjXFVY0F2pSr7oOuJ0rUEBRNYjuDUSkJJj8gSWpFiZqK6ixYUmzsJLSdppwoUXdAdQuO6SDZORimACJK1BVR6fPOYDD9IVOSsCxmihJ1MmqnKVAt7t2GQwoq5Y8sStQQ1E4xP220nUVPG9qxUCNK1ADUnV6iRIkSJeo2r3/8goLf1sfydQAAAABJRU5ErkJggg==" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E4%B8%AD%E5%AE%9E%E7%8E%B0%E7%BA%BF%E7%A8%8B"><span class="post-toc-number">1.</span> <span class="post-toc-text">用户空间中实现线程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BC%98%E7%82%B9"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">优点</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BC%BA%E7%82%B9"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">缺点</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%86%85%E6%A0%B8%E4%B8%AD%E5%AE%9E%E7%8E%B0%E7%BA%BF%E7%A8%8B"><span class="post-toc-number">2.</span> <span class="post-toc-text">内核中实现线程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BC%98%E7%82%B9-1"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">优点</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BC%BA%E7%82%B9-1"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">缺点</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B7%B7%E5%90%88%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">3.</span> <span class="post-toc-text">混合实现</span></a></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <p>有两种主要实现线程的方法：在用户空间中和在内核中。这两种方法互有利弊，同时也有混合的实现方式。</p>
+<h1 id="用户空间中实现线程"><a href="#用户空间中实现线程" class="headerlink" title="用户空间中实现线程"></a>用户空间中实现线程</h1><p>把整个线程包放在用户空间中，内核对线程包一无所知。从内核角度考虑，就是按正常的方式管理，即单线程进程。</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
+<li>可以在仅支持进程的操作系统上使用线程。</li>
+<li>线程切换代价小。当某个线程阻塞时，堆栈指针和程序计数器仅在用户空间中进行切换，不必陷入内核，对于内核来讲仍旧是当作一个进程来处理，故切换的时间比陷入内核要快一个数量级（甚至更多）。</li>
+<li>允许每个进程定制调度算法。例如，在某些应用程序中，那些有垃圾收集线程的应用程序就不用担心线程会在不合适的时刻停止。</li>
+<li>扩展性好。当各个进程的线程数量较多时，如果均为内核线程，那么内核需要管理的线程数量会过大。</li>
+</ol>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ol>
+<li>如何实现阻塞系统调用。如果直接让线程阻塞系统调用，实际上也会阻塞该线程所属进程的其他线程，因为对于内核来讲实际上是该线程的进程进行系统调用，该进程整体被阻塞挂起，进程里的其他线程也不能运行。<br>有些解决方案是，如果某些调用会阻塞，会提前通知。在某些UNIX版本中，有一个系统调用select可以允许调用者通知预期的read是否会阻塞。若有这个调用，那么库过程read就可以被新的操作替代，首先进行select调用，然后只有在安全的情形下（即不会阻塞）才进行read调用。如果read调用会被阻塞，有关的调用就不进行，代之以运行另一个线程。到了下次有关的运行系统取得控制权之后，就可以再次检查看看现在进行read调用是否安全。这个处理方法需要重写部分系统调用库，所以效率不高也不优雅，不过没有其他的可选方案了。</li>
+<li>缺页中断时会将整个进程挂起。如果有一个线程引起页面故障，内核由于甚至不知道有线程存在，通常会把整个进程阻塞直到磁盘I&#x2F;O完成为止，尽管其他的线程是可以运行的。</li>
+<li>由于进程内没有时钟中断，无法对线程进行超时调度处理。如果一个线程开始运行，那么在该进程中的其他线程就不能运行，除非第一个线程自动放弃CPU。在一个单独的进程内部，没有时钟中断，所以不可能用轮转调度（轮流）的方式调度进程。除非某个线程能够按照自己的意志进入运行时系统，否则调度程序就没有任何机会。</li>
+</ol>
+<h1 id="内核中实现线程"><a href="#内核中实现线程" class="headerlink" title="内核中实现线程"></a>内核中实现线程</h1><p>内核中有用来记录系统中所有线程的线程表。当某个线程希望创建一个新线程或撤销一个已有线程时，它会进行一个系统调用，这个系统调用通过对线程表的更新完成线程创建或撤销工作。<br>所有能够阻塞线程的调用都以系统调用的形式实现。当一个线程阻塞时，内核根据其选择，可以运行同一个进程中的另一个线程（若有一个就绪线程）或者运行另一个进程中的线程。而在用户级线程中，运行时系统始终运行自己进程中的线程，直到内核剥夺它的CPU（或者没有可运行的线程存在了）为止。<br>由于在内核中创建或撤销线程的代价比较大，某些系统也会利用“线程池”的处理方式，当某个进程被撤销时，只是标记一下但不回收，以备下次当作新的线程使用。</p>
+<h2 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h2><ol>
+<li>线程间的切换比较方便，每个线程可以像进程一样切换。比如某个进程中的线程引起了缺页中断，内核可以很方便地检查该进程是否有任何其他可运行的线程，如果有，在等待所需要的页面从磁盘读入时，就选择一个可运行的线程运行。</li>
+</ol>
+<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><ol>
+<li>线程切换代价大，每一个阻塞调用都以系统调用的方式实现，会陷入内核进行切换，线程的操作（创建、终止等）比较多，就会带来很大的开销。</li>
+</ol>
+<h1 id="混合实现"><a href="#混合实现" class="headerlink" title="混合实现"></a>混合实现</h1><p>一种方法是使用内核级线程，然后将用户级线程与某些或者全部内核线程多路复用起来，如图所示。如果采用这种方法，编程人员可以决定有多少个内核级线程和多少个用户级线程彼此多路复用。这一模型带来最大的灵活度。</p>
+<p><img src="/../assets/images/%E7%BA%BF%E7%A8%8B1.png" alt="用户级线程与内核级线程多路复用"></p>
+<p>采用这种方法，内核只识别内核级线程，并对其进行调度。其中一些内核级线程会被多个用户级线程多路复用。如同在没有多线程能力操作系统中某个进程中的用户级线程一样，可以创建、撤销和调度这些用户级线程。在这种模型中，每个内核级线程有一个可以轮流使用的用户级线程集合。（即将内核实现还是用户空间实现的程度交由程序员决定）</p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-08-28");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-08-21T08:25:38.000Z" itemprop="datePublished">2022-08-21</time>
+
+    , 最后修改于&nbsp;<time datetime="2022-08-28T07:04:46.302Z" itemprop="dateModified">2022-08-28</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#&nbsp;操作系统</a>
+
+<a class="post-tags-list-item" href="/tags/%E8%BF%9B%E7%A8%8B/" rel="tag">#&nbsp;进程</a>
+
+<a class="post-tags-list-item" href="/tags/%E7%BA%BF%E7%A8%8B/" rel="tag">#&nbsp;线程</a>
+
+<a class="post-tags-list-item" href="/tags/%E5%86%85%E6%A0%B8%E8%BF%9B%E7%A8%8B/" rel="tag">#&nbsp;内核进程</a>
+
+<a class="post-tags-list-item" href="/tags/%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E8%BF%9B%E7%A8%8B/" rel="tag">#&nbsp;用户空间进程</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/08/28/%E6%AD%BB%E9%94%81/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">死锁</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/07/30/js%E5%BD%BB%E6%90%9E%E6%87%82%E5%8E%9F%E5%9E%8B/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">js彻搞懂原型</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

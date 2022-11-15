@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step7-diff算法 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step7-diff算法 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/"><meta property="og:locale" content="zh-CN"><meta name="description" content="问题定义之前的步骤只实现了对dom“增删改查”中的“改”和“查”，“增”和“删”还未实现。diff算法其实就是用来实现“增删改”dom树的一个解决方案。具体来讲，在更新dom树时会有当前显示的旧的虚拟dom树、和更新目标新的虚拟dom树，如果直接进行dom树的替换，虽然实现起来较为简单，但是性能非常差劲，所以diff算法的目标就是，找到从旧dom树转化为新dom树所需要的最小编辑操作，并且将这一系 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, MVVM, vue, react, diff"><meta property="og:image" content="http://example.com/assets/images/MVVM-step7-1.gif"><meta property="article:published_time" content="2022-10-15T03:23:44.000Z"><meta property="article:modified_time" content="2022-10-15T09:14:20.254Z"><meta property="og:updated_time" content="2022-10-15T09:14:20.254Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, MVVM, vue, react, diff"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/"
+    },
+    "headline": "手写MVVM框架-step7-diff算法 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-15T03:23:44.000Z",
+    "dateModified": "2022-10-15T09:14:20.254Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, MVVM, vue, react, diff",
+    "description": "问题定义之前的步骤只实现了对dom“增删改查”中的“改”和“查”，“增”和“删”还未实现。diff算法其实就是用来实现“增删改”dom树的一个解决方案。具体来讲，在更新dom树时会有当前显示的旧的虚拟dom树、和更新目标新的虚拟dom树，如果直接进行dom树的替换，虽然实现起来较为简单，但是性能非常差劲，所以diff算法的目标就是，找到从旧dom树转化为新dom树所需要的最小编辑操作，并且将这一系 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step7-diff算法" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step7-diff算法&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step7-diff算法" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAAAAAAYplnuAAACoElEQVR42u3c207sMBBE0fz/T8MrEnHXLuMZNMqel4O4JMtIJt3lnnN9feDrEi1atOgHoq/hdfuDP7529/HONahDtGiKXl14tTB68zvo3fdjh2jRBXq66N3nV4tebaRpMfR+okWfQt9tvNUDY0KtPhYt+r/QE2J6KKUHjGjRr0CvCpVmIbsPjeNVnujHo6eG8p3/HuvGRT8aHUO/RaFDGmD6YDmemop+NHraCKnYnxaTAh0SYIoWvYsmYWBqXKdfQApzaJApWjRBN8imoE+fI2HQr2uIFg3RU0CeDoSawipt5HQd0aJbdAtNxTzZqHRxokU36OU3TX/oQaFDH0C4cRYtGqDTw2I6lE8FFf3F4IWKFg3Q7cBVKqpSsU+HWqrUVLToRVhDmlAKapoE8pARLbpFp2C8PRgiIU4aysIH+qJFh4KJvikhDVCl4JI21qJFn0CTxpYU8s3GjPcRLRqGNWkjkgs2h6lkGGAckBUtGs5Pp6HsdOBPF79dPIkWDc8RyZDq1Kg2YUxbbMUpBNGiYViTAsh2g7WBZzwJEC16o7ElIWPabG0wPy5QtGiAJptk2iw0VE/BTV0wiRYd6ulx2HrjzQ5Tw9s2uaJFN2h8SLP5RobmkLXqxkWL/sP7XEhzShrVZiOjAVnRokETQB8CqZltDzrRfUSLLtHtJqQhTvM1HECKFh3QKZhpwsVmM9MGQLToEwFkGnKlC08hPQkpRYumaBpC0kMefOgDDpq2UlPRj0eT4qgZsqqGTkCoPgaQokWHgonclBxS7gaYokWfRDeHkWRAnA5UkYBTtOhXoNPAIT14IgMBeKpXtOgD/xF8EyTubsQqNRUtuiyYEvLEkEoaEBAtukVPm6HBT+FL2qhkM4oWTdCf9BItWrToB6G/AfgEWbecUUVIAAAAAElFTkSuQmCC" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step7-diff算法</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-15</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step7-diff算法&url=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step7-diff算法&url=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAAAAAAYplnuAAACoElEQVR42u3c207sMBBE0fz/T8MrEnHXLuMZNMqel4O4JMtIJt3lnnN9feDrEi1atOgHoq/hdfuDP7529/HONahDtGiKXl14tTB68zvo3fdjh2jRBXq66N3nV4tebaRpMfR+okWfQt9tvNUDY0KtPhYt+r/QE2J6KKUHjGjRr0CvCpVmIbsPjeNVnujHo6eG8p3/HuvGRT8aHUO/RaFDGmD6YDmemop+NHraCKnYnxaTAh0SYIoWvYsmYWBqXKdfQApzaJApWjRBN8imoE+fI2HQr2uIFg3RU0CeDoSawipt5HQd0aJbdAtNxTzZqHRxokU36OU3TX/oQaFDH0C4cRYtGqDTw2I6lE8FFf3F4IWKFg3Q7cBVKqpSsU+HWqrUVLToRVhDmlAKapoE8pARLbpFp2C8PRgiIU4aysIH+qJFh4KJvikhDVCl4JI21qJFn0CTxpYU8s3GjPcRLRqGNWkjkgs2h6lkGGAckBUtGs5Pp6HsdOBPF79dPIkWDc8RyZDq1Kg2YUxbbMUpBNGiYViTAsh2g7WBZzwJEC16o7ElIWPabG0wPy5QtGiAJptk2iw0VE/BTV0wiRYd6ulx2HrjzQ5Tw9s2uaJFN2h8SLP5RobmkLXqxkWL/sP7XEhzShrVZiOjAVnRokETQB8CqZltDzrRfUSLLtHtJqQhTvM1HECKFh3QKZhpwsVmM9MGQLToEwFkGnKlC08hPQkpRYumaBpC0kMefOgDDpq2UlPRj0eT4qgZsqqGTkCoPgaQokWHgonclBxS7gaYokWfRDeHkWRAnA5UkYBTtOhXoNPAIT14IgMBeKpXtOgD/xF8EyTubsQqNRUtuiyYEvLEkEoaEBAtukVPm6HBT+FL2qhkM4oWTdCf9BItWrToB6G/AfgEWbecUUVIAAAAAElFTkSuQmCC" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题定义</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%89%BE%E5%87%BA%E6%9B%B4%E6%96%B0%E7%9A%84%E7%BC%96%E8%BE%91%E6%93%8D%E4%BD%9C"><span class="post-toc-number">2.</span> <span class="post-toc-text">找出更新的编辑操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%89%A7%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="post-toc-number">3.</span> <span class="post-toc-text">执行操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">4.</span> <span class="post-toc-text">测试</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="post-toc-number">5.</span> <span class="post-toc-text">参考链接</span></a></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><p>之前的步骤只实现了对dom“增删改查”中的“改”和“查”，“增”和“删”还未实现。diff算法其实就是用来实现“增删改”dom树的一个解决方案。具体来讲，在更新dom树时会有当前显示的旧的虚拟dom树、和更新目标新的虚拟dom树，如果直接进行dom树的替换，虽然实现起来较为简单，但是性能非常差劲，所以diff算法的目标就是，找到从旧dom树转化为新dom树所需要的最小编辑操作，并且将这一系列操作应用到真实dom树中以实现dom树的更新。故可将问题分为如下两个步骤：</p>
+<ol>
+<li>找出更新的编辑操作。对比新旧两颗虚拟dom树，找到从旧dom树到新dom树的操作序列。</li>
+<li>打补丁。执行操作序列更新真实dom树。</li>
+</ol>
+<h1 id="找出更新的编辑操作"><a href="#找出更新的编辑操作" class="headerlink" title="找出更新的编辑操作"></a>找出更新的编辑操作</h1><p>问题可以细化为，输入两颗虚拟dom树的根节点pre和cur，实现一个函数diff，可以返回从pre变化成cur的更新操作。目前暂时实现一个初始版本，仅用如下四种操作进行更新：</p>
+<ul>
+<li>update。更新节点，节点类型不变，只是props属性有变化。</li>
+<li>delete。删除节点，旧dom树有，新dom树无。</li>
+<li>insert。插入节点，旧dom树无，新dom树有。</li>
+<li>replace。替换节点，新旧节点类型不同，直接替换。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable constant_">PATCH</span> = &#123;</span><br><span class="line">    <span class="attr">INSERT</span>: <span class="string">&#x27;insert&#x27;</span>,</span><br><span class="line">    <span class="attr">DELETE</span>: <span class="string">&#x27;delete&#x27;</span>,</span><br><span class="line">    <span class="attr">REPPLACE</span>: <span class="string">&#x27;replace&#x27;</span>,</span><br><span class="line">    <span class="attr">UPDATE</span>: <span class="string">&#x27;update&#x27;</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大体思路为深度优先遍历新旧虚拟dom树的并集节点（即对于同一层级，遍历个数为新旧树中节点树最大值，如果新dom树节点数较多，那么多出来的节点执行insert操作，反之执行delete操作），并且将遍历顺序当作节点的唯一索引。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">diff</span>(<span class="params">preNode, curNode</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> patches = &#123;&#125;;</span><br><span class="line">    <span class="comment">// 节点唯一标识</span></span><br><span class="line">    <span class="keyword">let</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="title function_">walk</span>(preNode, curNode, patches);</span><br><span class="line">    <span class="keyword">return</span> patches;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">walk</span>(<span class="params">preNode, curNode, patches</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (preNode === curNode) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">// 旧节点不存在</span></span><br><span class="line">        <span class="keyword">if</span> (!preNode &amp;&amp; curNode) &#123;</span><br><span class="line">            patches[index] = &#123;</span><br><span class="line">                    <span class="attr">type</span>: <span class="variable constant_">PATCH</span>.<span class="property">INSERT</span>,</span><br><span class="line">                    <span class="attr">node</span>: curNode</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// insert后不对子节点进行遍历</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 新节点不存在</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (preNode &amp;&amp; !curNode) &#123;</span><br><span class="line">            patches[index] = &#123;</span><br><span class="line">                    <span class="attr">type</span>: <span class="variable constant_">PATCH</span>.<span class="property">DELETE</span>,</span><br><span class="line">                    <span class="attr">node</span>: preNode</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 删除后不对子节点进行遍历</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 文本</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (preNode.<span class="property">type</span> == <span class="string">&#x27;text&#x27;</span> &amp;&amp; curNode.<span class="property">type</span> == <span class="string">&#x27;text&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (preNode.<span class="property">props</span>.<span class="property">value</span> !== curNode.<span class="property">props</span>.<span class="property">value</span>) &#123;</span><br><span class="line">                patches[index] = &#123;</span><br><span class="line">                    <span class="attr">type</span>: <span class="variable constant_">PATCH</span>.<span class="property">UPDATE</span>,</span><br><span class="line">                    <span class="attr">props</span>: &#123; <span class="attr">jsxStr</span>: curNode.<span class="property">props</span>.<span class="property">jsxStr</span> &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (preNode.<span class="property">type</span> === curNode.<span class="property">type</span>) &#123;</span><br><span class="line">            <span class="keyword">let</span> attr = <span class="title function_">diffAttribute</span>(preNode, curNode);</span><br><span class="line">            <span class="keyword">if</span> (<span class="title class_">Object</span>.<span class="title function_">keys</span>(attr).<span class="property">length</span> &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                patches[index] = &#123;</span><br><span class="line">                    <span class="attr">type</span>: <span class="variable constant_">PATCH</span>.<span class="property">UPDATE</span>,</span><br><span class="line">                    <span class="attr">props</span>: attr</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            patches[index] = &#123;</span><br><span class="line">                    <span class="attr">type</span>: <span class="variable constant_">PATCH</span>.<span class="property">REPPLACE</span>,</span><br><span class="line">                    <span class="attr">node</span>: curNode</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 替换后不对子节点进行遍历</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 遍历两个虚拟dom树的最大并集</span></span><br><span class="line">        <span class="keyword">let</span> preChildren = !preNode ? [] : preNode.<span class="property">children</span>;</span><br><span class="line">        <span class="keyword">let</span> newChildren = !curNode ? [] : curNode.<span class="property">children</span>;</span><br><span class="line">        <span class="comment">// 遍历所有节点</span></span><br><span class="line">        <span class="keyword">let</span> len = <span class="title class_">Math</span>.<span class="title function_">max</span>(preChildren.<span class="property">length</span>, newChildren.<span class="property">length</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            index++;</span><br><span class="line">            <span class="title function_">walk</span>(preChildren[i], newChildren[i], patches);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意涉及到delete、insert和raplace的节点，并不需要继续往下深度优先遍历，因为对于delete来说，反正要删除改节点，即也删除了该节点下的所有节点；对于insert来说，新增的子节点信息均在新节点中；replace同理。（因此也会有很大的性能问题，没有考虑兄弟节点顺序变化可复用的情况）</p>
+<p>其中对于update操作的属性对比diffAttribute函数的实现如下，首先遍历旧节点找出新节点更新的内容，如果新节点没有则会被设置为undefined意为删除。然后再遍历新节点找出旧节点中没有的属性：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">diffAttribute</span>(<span class="params">preNode, curNode</span>) &#123;</span><br><span class="line">    <span class="comment">// 返回将旧props转化为新props的更新</span></span><br><span class="line">    <span class="keyword">let</span> attr = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> preNode.<span class="property">props</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (preNode.<span class="property">props</span>[key] !== curNode.<span class="property">props</span>[key]) &#123;</span><br><span class="line">            <span class="comment">// 可能为undefined，意为删除该属性</span></span><br><span class="line">            attr[key] = curNode.<span class="property">props</span>[key];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 增加旧节点没有的属性</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> curNode.<span class="property">props</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!preNode.<span class="property">props</span>.<span class="title function_">hasOwnProperty</span>(key)) &#123;</span><br><span class="line">            attr[key] = curNode.<span class="property">props</span>[key];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> attr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="执行操作"><a href="#执行操作" class="headerlink" title="执行操作"></a>执行操作</h1><p>执行diff后的编辑操作的遍历顺序同diff时相同，也是遇到非update的操作不再继续，以保证遍历顺序和节点索引的一致性。</p>
+<p>在这里的实现为更新后，新的虚拟dom树为对应在真实dom上的节点，所以对于没有变化的节点要拷贝旧节点的真实dom引用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patch</span>(<span class="params">preNode, curNode, patches</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="title function_">walk</span>(preNode, curNode);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">walk</span>(<span class="params">preNode, curNode, parentNode = <span class="literal">null</span></span>) &#123;</span><br><span class="line">        <span class="title function_">doPatch</span>(preNode, curNode, parentNode, patches[index]);</span><br><span class="line">        <span class="keyword">if</span> (patches[index]) &#123;</span><br><span class="line">            <span class="comment">// 遍历顺序和diff比较顺序相同，遇到这几种情况的操作不进行遍历</span></span><br><span class="line">            <span class="keyword">if</span> ([<span class="string">&#x27;replace&#x27;</span>, <span class="string">&#x27;insert&#x27;</span>, <span class="string">&#x27;delete&#x27;</span>].<span class="title function_">indexOf</span>(patches[index].<span class="property">type</span>) != -<span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 没有变化的节点直接拷贝真实dom的指针</span></span><br><span class="line">            curNode[targetDom] = preNode[targetDom];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">let</span> preChildren = !preNode ? [] : preNode.<span class="property">children</span>;</span><br><span class="line">        <span class="keyword">let</span> newChildren = !curNode ? [] : curNode.<span class="property">children</span>;</span><br><span class="line">        <span class="comment">// 遍历所有节点</span></span><br><span class="line">        <span class="keyword">let</span> len = <span class="title class_">Math</span>.<span class="title function_">max</span>(preChildren.<span class="property">length</span>, newChildren.<span class="property">length</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            index++;</span><br><span class="line">            <span class="title function_">walk</span>(preChildren[i], newChildren[i], preNode);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在执行操作的时候对于update操作为了复用真实dom节点，也要拷贝真实dom节点的引用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doPatch</span>(<span class="params">preNode, curNode, parentNode, patch</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!patch) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span> (patch.<span class="property">type</span> === <span class="variable constant_">PATCH</span>.<span class="property">DELETE</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (parentNode) &#123;</span><br><span class="line">            <span class="comment">// 从parentNode中删除preNode</span></span><br><span class="line">            patchFunction.<span class="title function_">delete</span>(parentNode, preNode);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (patch.<span class="property">type</span> === <span class="variable constant_">PATCH</span>.<span class="property">INSERT</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (parentNode) &#123;</span><br><span class="line">            <span class="comment">// 向parentNode添加patch.node</span></span><br><span class="line">            patchFunction.<span class="title function_">insert</span>(parentNode, curNode);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (patch.<span class="property">type</span> === <span class="variable constant_">PATCH</span>.<span class="property">UPDATE</span>) &#123;</span><br><span class="line">        <span class="comment">// 更新preNode</span></span><br><span class="line">        patchFunction.<span class="title function_">update</span>(preNode, patch.<span class="property">props</span>);</span><br><span class="line">        curNode[targetDom] = preNode[targetDom];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (patch.<span class="property">type</span> === <span class="variable constant_">PATCH</span>.<span class="property">REPPLACE</span>) &#123;</span><br><span class="line">        patchFunction.<span class="title function_">replace</span>(parentNode, preNode, curNode);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> patchFunction = &#123;</span><br><span class="line">    <span class="attr">delete</span>: <span class="function">(<span class="params">parentNode, preNode</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 移除真实dom上的节点</span></span><br><span class="line">        parentNode[targetDom].<span class="title function_">removeChild</span>(preNode[targetDom]);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">insert</span>: <span class="function">(<span class="params">parentNode, newNode</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 渲染出新真实的dom节点</span></span><br><span class="line">        newNode = <span class="title function_">render</span>(newNode);</span><br><span class="line">        <span class="comment">// 插入到真实的dom父节点上</span></span><br><span class="line">        parentNode[targetDom].<span class="title function_">appendChild</span>(newNode[targetDom]);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">update</span>: <span class="function">(<span class="params">preNode, props</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 更新旧节点props</span></span><br><span class="line">        <span class="title class_">Object</span>.<span class="title function_">assign</span>(preNode.<span class="property">props</span>, props);</span><br><span class="line">        <span class="comment">// 执行该虚拟dom对真实dom的更新</span></span><br><span class="line">        preNode.<span class="title function_">getComponent</span>().<span class="title function_">update</span>(preNode);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">replace</span>: <span class="function">(<span class="params">parentNode, preNode, newNode</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 渲染出新真实的dom节点</span></span><br><span class="line">        newNode = <span class="title function_">render</span>(newNode);</span><br><span class="line">        <span class="comment">// 替换真实dom节点</span></span><br><span class="line">        parentNode[targetDom].<span class="title function_">replaceChild</span>(newNode[targetDom], preNode[targetDom]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>为了测试方便，封装一个changeTo函数用来更新虚拟dom树为另一个HTML文本描述的形式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">changeTo</span>(<span class="params">node, template, props</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> cur = <span class="title function_">createComponent</span>(template, props);</span><br><span class="line">    <span class="keyword">let</span> patches = <span class="title function_">diff</span>(node, cur);</span><br><span class="line">    <span class="title function_">patch</span>(node, cur, patches);</span><br><span class="line">    <span class="comment">// 返回新节点</span></span><br><span class="line">    <span class="keyword">return</span> cur;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    表格</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    Hello World!</span></span><br><span class="line"><span class="string">    &lt;ul&gt;</span></span><br><span class="line"><span class="string">        &lt;li&gt;姓 名&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;li&gt;年 龄&lt;/li&gt;</span></span><br><span class="line"><span class="string">    &lt;/ul&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> template2 = <span class="string">`</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    表格</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    &lt;ul&gt;</span></span><br><span class="line"><span class="string">        &lt;li&gt;姓 名: lzh&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;li&gt;年 龄&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;li&gt;性 别&lt;/li&gt;</span></span><br><span class="line"><span class="string">    &lt;/ul&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> pre = <span class="title function_">createComponent</span>(template, &#123;&#125;);</span><br><span class="line"><span class="title function_">render</span>(pre, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    pre = <span class="title function_">changeTo</span>(pre, template2);</span><br><span class="line">&#125;, <span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    pre = <span class="title function_">changeTo</span>(pre, template);</span><br><span class="line">&#125;, <span class="number">2000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到1秒后换为template2的dom树，2秒后又换会template：</p>
+<p><img src="/../assets/images/MVVM-step7-1.gif" alt="运行结果"></p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903806132568072#heading-7">https://juejin.cn/post/6844903806132568072#heading-7</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/oAlVmZ4Hbt2VhOwFEkNEhw">https://mp.weixin.qq.com/s/oAlVmZ4Hbt2VhOwFEkNEhw</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000019510611">https://segmentfault.com/a/1190000019510611</a></p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-15");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-15T03:23:44.000Z" itemprop="datePublished">2022-10-15</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+<a class="post-tags-list-item" href="/tags/diff/" rel="tag">#&nbsp;diff</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/27/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">浏览器缓存</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step6-实现v-model双向绑定</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

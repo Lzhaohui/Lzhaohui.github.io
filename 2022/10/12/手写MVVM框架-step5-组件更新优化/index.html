@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step5-组件更新优化 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step5-组件更新优化 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/"><meta property="og:locale" content="zh-CN"><meta name="description" content="问题定义针对上一步实现的update，每次更新都需要从根节点遍历更新所有节点的问题，效率很差，如果可以只更新部分变化的节点，则可以大大的优化渲染。具体来讲，实现一个函数proxy监听组件props的改变，当props的某些属性改变时，只重新update引用该属性变量的虚拟节点。 使用Proxy监听props的读取和改变众所周知，vue2通过defineProperty实现双向绑定，vue3则是通过 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, MVVM, vue, react, 组件, 观察者模式, proxy"><meta property="og:image" content="http://example.com/assets/images/MVVM-step5-1.jpg"><meta property="og:image" content="http://example.com/assets/images/MVVM-step5-2.jpg"><meta property="article:published_time" content="2022-10-12T07:32:12.000Z"><meta property="article:modified_time" content="2022-10-14T04:07:37.476Z"><meta property="og:updated_time" content="2022-10-14T04:07:37.476Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, MVVM, vue, react, 组件, 观察者模式, proxy"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/"
+    },
+    "headline": "手写MVVM框架-step5-组件更新优化 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-12T07:32:12.000Z",
+    "dateModified": "2022-10-14T04:07:37.476Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, MVVM, vue, react, 组件, 观察者模式, proxy",
+    "description": "问题定义针对上一步实现的update，每次更新都需要从根节点遍历更新所有节点的问题，效率很差，如果可以只更新部分变化的节点，则可以大大的优化渲染。具体来讲，实现一个函数proxy监听组件props的改变，当props的某些属性改变时，只重新update引用该属性变量的虚拟节点。 使用Proxy监听props的读取和改变众所周知，vue2通过defineProperty实现双向绑定，vue3则是通过 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step5-组件更新优化" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step5-组件更新优化&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step5-组件更新优化" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADpklEQVR42u3a247iQAxFUf7/p3ueWmqNiM8+4RKDNi+NZiBkRaqyy/bt5wtfN1GiRIkS9XWo2/D6+///f/73/d+/997fu+b03elz032KErUJdXfRDT92BJ4gCTtdB9+nKFGLUOki9y6aNpjDIDks/nvXp/cpStQnoKabbL87AY6u2zx8UaI+BXW0iFOwnTaQKYDTzUWUqM2otFiPDoJkkaeDZPMQn5KlixL1YhRJTDf8fWo1SZSoF6FI0EtFzinZJUXOqWhKArMoUZtQNFFtFnVTVJkeFNocSEYhStQbUe3CpAfGR5pu9GHH3U+UqAtQqdk1XTgF2ylQny24jA9XlKglKNpMTjecAitt2jVDJOjkK0rUG1F0EKRpRqehrOnhtEhRoraiUgE/BcAYGIdk90zSfDfgixK1CNUOYzSDjemmm0Hg6TdEidqCIj82HfbOJL/NRkCCsihRm1BnhqfSA6CNAjokgg6dokQtQaUktCnqP7pZ0KHJmNCKEnURijaS6QDHdHCsGmhDohyDryhRF6KaxhYNvE1DmzbEp81KlKitKHJYo021RxpvzRAX7nqIEvUmVPOjzxqySkE1BdvDjUaUqAUoWjR8RnP77CZDmwSiRG1A0QY0SUxpc+HMkEmV0IoSdTEqDTTRIEgHo2gTLw5YkYRWlKg3o+gCp01tusCf0WyoJjNFiXojiiaRZKiRFFToNdukWpSoDahmAyDNuGmAsUmW6XClKFHbUOSARhcvDd7k+6kZjoqZokRdiJqK/Sm4pu82B8SUJI+NcFGilqGaBlezGZBhrDNDV6JEbUVNwS0tftooIDdGgvHYzBAlagGKNtqm97QQQwanzjwEUaI2otohkDPNsrQBtINXhw0CUaIuRB39YCqo0MSTDog0DbfD64gStQzVbBCpWUa/Swe+yEMWJWoLqrnIuFDLQj8p2NDhYlGitqDIsGFb5J82HxKg00ZyeGgUJWoBihYV68JiefhrHhgeDhEl6kJUurG2+fwDXhSJD5GiRC1AtSDyWTJU1QwN04KrKFEbUGcGP1IR82wjj25eKKEVJeoiFF2IzYJtmm+p0FldR5SoJahUaEkDwKTYSQNqagSgppsoUQtQ6WbTv5GbnZLjMxsUahCIErUMlRLStLFMhROSQDeNC1GiPgU1DSJOiSxpxKUCD2mqixK1EUUS2lR8iYO7oNGGBxafdUgUJeoFqKbwQpPb5sGkpkEK6qJEbUJ900uUKFGiRH3N6x9wFrSRIKoBLAAAAABJRU5ErkJggg==" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step5-组件更新优化</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-12</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step5-组件更新优化&url=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step5-组件更新优化&url=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADpklEQVR42u3a247iQAxFUf7/p3ueWmqNiM8+4RKDNi+NZiBkRaqyy/bt5wtfN1GiRIkS9XWo2/D6+///f/73/d+/997fu+b03elz032KErUJdXfRDT92BJ4gCTtdB9+nKFGLUOki9y6aNpjDIDks/nvXp/cpStQnoKabbL87AY6u2zx8UaI+BXW0iFOwnTaQKYDTzUWUqM2otFiPDoJkkaeDZPMQn5KlixL1YhRJTDf8fWo1SZSoF6FI0EtFzinZJUXOqWhKArMoUZtQNFFtFnVTVJkeFNocSEYhStQbUe3CpAfGR5pu9GHH3U+UqAtQqdk1XTgF2ylQny24jA9XlKglKNpMTjecAitt2jVDJOjkK0rUG1F0EKRpRqehrOnhtEhRoraiUgE/BcAYGIdk90zSfDfgixK1CNUOYzSDjemmm0Hg6TdEidqCIj82HfbOJL/NRkCCsihRm1BnhqfSA6CNAjokgg6dokQtQaUktCnqP7pZ0KHJmNCKEnURijaS6QDHdHCsGmhDohyDryhRF6KaxhYNvE1DmzbEp81KlKitKHJYo021RxpvzRAX7nqIEvUmVPOjzxqySkE1BdvDjUaUqAUoWjR8RnP77CZDmwSiRG1A0QY0SUxpc+HMkEmV0IoSdTEqDTTRIEgHo2gTLw5YkYRWlKg3o+gCp01tusCf0WyoJjNFiXojiiaRZKiRFFToNdukWpSoDahmAyDNuGmAsUmW6XClKFHbUOSARhcvDd7k+6kZjoqZokRdiJqK/Sm4pu82B8SUJI+NcFGilqGaBlezGZBhrDNDV6JEbUVNwS0tftooIDdGgvHYzBAlagGKNtqm97QQQwanzjwEUaI2otohkDPNsrQBtINXhw0CUaIuRB39YCqo0MSTDog0DbfD64gStQzVbBCpWUa/Swe+yEMWJWoLqrnIuFDLQj8p2NDhYlGitqDIsGFb5J82HxKg00ZyeGgUJWoBihYV68JiefhrHhgeDhEl6kJUurG2+fwDXhSJD5GiRC1AtSDyWTJU1QwN04KrKFEbUGcGP1IR82wjj25eKKEVJeoiFF2IzYJtmm+p0FldR5SoJahUaEkDwKTYSQNqagSgppsoUQtQ6WbTv5GbnZLjMxsUahCIErUMlRLStLFMhROSQDeNC1GiPgU1DSJOiSxpxKUCD2mqixK1EUUS2lR8iYO7oNGGBxafdUgUJeoFqKbwQpPb5sGkpkEK6qJEbUJ900uUKFGiRH3N6x9wFrSRIKoBLAAAAABJRU5ErkJggg==" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题定义</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BD%BF%E7%94%A8Proxy%E7%9B%91%E5%90%ACprops%E7%9A%84%E8%AF%BB%E5%8F%96%E5%92%8C%E6%94%B9%E5%8F%98"><span class="post-toc-number">2.</span> <span class="post-toc-text">使用Proxy监听props的读取和改变</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BF%AE%E6%94%B9%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">修改调用结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BC%98%E5%8C%96%E4%B8%80%E6%AC%A1setState%E5%A4%9A%E6%AC%A1%E6%9B%B4%E6%96%B0%E8%8A%82%E7%82%B9%E9%97%AE%E9%A2%98"><span class="post-toc-number">3.</span> <span class="post-toc-text">优化一次setState多次更新节点问题</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">4.</span> <span class="post-toc-text">测试</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">问题</span></a></li></ol></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><p>针对上一步实现的update，每次更新都需要从根节点遍历更新所有节点的问题，效率很差，如果可以只更新部分变化的节点，则可以大大的优化渲染。具体来讲，实现一个函数proxy监听组件props的改变，当props的某些属性改变时，只重新update引用该属性变量的虚拟节点。</p>
+<h1 id="使用Proxy监听props的读取和改变"><a href="#使用Proxy监听props的读取和改变" class="headerlink" title="使用Proxy监听props的读取和改变"></a>使用Proxy监听props的读取和改变</h1><p>众所周知，vue2通过defineProperty实现双向绑定，vue3则是通过Proxy实现的双向绑定。在这里，我们可以巧妙的运用Proxy对get和set的监听，以实现虚拟节点和props属性的映射。</p>
+<p>具体来讲，通过get监听哪些虚拟节点调用该props属性值key，通过curNode变量来记录当前update的节点，通过set来判断如果key值变化则只更新在get节点使用过该key的虚拟节点：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">// 维护一个变量，指向当前更新的节点</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">curNode</span> = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">proxy</span>(<span class="params">props</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Proxy</span>(props, &#123;</span><br><span class="line">            <span class="attr">get</span>: <span class="function">(<span class="params">target, key</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="comment">// 仅在update时设置为当前节点，非update时候为null</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">curNode</span>) &#123;</span><br><span class="line">                    <span class="comment">// todo: 记录this.curNode使用了key</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="title class_">Reflect</span>.<span class="title function_">get</span>(target, key);</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">set</span>: <span class="function">(<span class="params">target, key, value, receiver</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="comment">// 如果新旧值不相等</span></span><br><span class="line">                <span class="keyword">if</span> (value !== target[key]) &#123;</span><br><span class="line">                    <span class="comment">// todo: 更新key所对应的所有虚拟节点</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="title class_">Reflect</span>.<span class="title function_">set</span>(target, key, value, receiver);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中对于key和虚拟节点的记录，其实可以抽象成观察者模式进行实现，即一个on函数记录key和节点的映射关系，一个getElements函数得到key对应的所有节点：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ElementEmitter</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">keyEvents</span> = &#123;&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 绑定vdom会引用key</span></span><br><span class="line">    <span class="title function_">on</span>(<span class="params">key, vdom</span>) &#123;</span><br><span class="line">        <span class="comment">// console.log(key, vdom);</span></span><br><span class="line">        <span class="keyword">if</span> (key <span class="keyword">in</span> <span class="variable language_">this</span>.<span class="property">keyEvents</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">keyEvents</span>[key].<span class="title function_">add</span>(vdom);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">keyEvents</span>[key] = <span class="keyword">new</span> <span class="title class_">Set</span>([vdom]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">getElements</span>(<span class="params">key</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (key <span class="keyword">in</span> <span class="variable language_">this</span>.<span class="property">keyEvents</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="title class_">Array</span>.<span class="title function_">from</span>(<span class="variable language_">this</span>.<span class="property">keyEvents</span>[key]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> [];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终proxy实现如下，其中在监听到修改以后需要采用异步更新，否则还无法得到更新后的props结果：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">// 维护一个变量，指向当前更新的节点</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">curNode</span> = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">update</span>(<span class="params">vdom = <span class="variable language_">this</span></span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">curNode</span> = vdom;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title function_">proxy</span>(<span class="params">props</span>) &#123;</span><br><span class="line">        <span class="keyword">let</span> emitter = <span class="keyword">new</span> <span class="title class_">ElementEmitter</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Proxy</span>(props, &#123;</span><br><span class="line">            <span class="attr">get</span>: <span class="function">(<span class="params">target, key</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="comment">// 仅在update时监听，非update时候为null</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">curNode</span>) &#123;</span><br><span class="line">                    emitter.<span class="title function_">on</span>(key, <span class="variable language_">this</span>.<span class="property">curNode</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="title class_">Reflect</span>.<span class="title function_">get</span>(target, key);</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">set</span>: <span class="function">(<span class="params">target, key, value, receiver</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (value !== target[key]) &#123;</span><br><span class="line">                    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;更新&#x27;</span>);</span><br><span class="line">                    <span class="keyword">let</span> vdoms = emitter.<span class="title function_">getElements</span>(key);</span><br><span class="line">                    <span class="comment">// 异步更新，否则在监听到props更新时，props的值还未改变</span></span><br><span class="line">                    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                        vdoms.<span class="title function_">forEach</span>(<span class="function"><span class="params">vdom</span> =&gt;</span> &#123;</span><br><span class="line">                            <span class="variable language_">this</span>.<span class="title function_">update</span>(vdom);</span><br><span class="line">                        &#125;);</span><br><span class="line">                    &#125;);</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="title class_">Reflect</span>.<span class="title function_">set</span>(target, key, value, receiver);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中在resolveJsx中需要通过has判断需要调用的props属性，从而按需触发Proxy的set函数（这里仅使用了字符串匹配，没有考虑关键字不是变量的情况）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">resolveJsx</span>(<span class="params">str, jsxProps</span>) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">let</span> ctx = iframe.<span class="property">contentWindow</span>;</span><br><span class="line">    <span class="comment">// 仅读取需要的变量</span></span><br><span class="line">    <span class="title class_">Object</span>.<span class="title function_">keys</span>(jsxProps).<span class="title function_">forEach</span>(<span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (str.<span class="title function_">search</span>(key) != -<span class="number">1</span>) &#123;</span><br><span class="line">            ctx[key] = jsxProps[key];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="修改调用结构"><a href="#修改调用结构" class="headerlink" title="修改调用结构"></a>修改调用结构</h2><p>在之前写的createComponent、update、render函数功能有一些耦合，例如createComponent解析HTML文本的同时也解析了jsx内容，update是重新解析jsx文本同时更新虚拟dom和真实dom，render是根据虚拟dom创建真实dom到指定的dom节点上。</p>
+<p>为了使proxy监听的部分在所有阶段都生效（之前如果未update则proxy无效，现在强制在render前update），现将其功能解耦如下：</p>
+<ol>
+<li>createComponent函数仅负责解析HTML文本，并创建仅保存了jsx文本的虚拟节点。</li>
+<li>update函数仅负责根据组件的props重新计算每一个虚拟dom节点的props，并且如果有绑定真实dom节点则更新。</li>
+<li>render函数仅负责根据虚拟dom节点创建真实dom节点。</li>
+</ol>
+<p>这样初始换的流程就变成如下形式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> root = <span class="title function_">createComponent</span>(template, &#123;&#125;);</span><br><span class="line">root.<span class="title function_">update</span>();</span><br><span class="line"><span class="title function_">render</span>(root, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// root.update();</span></span><br><span class="line"><span class="comment">// root.update();</span></span><br><span class="line"><span class="comment">// root.update();</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h1 id="优化一次setState多次更新节点问题"><a href="#优化一次setState多次更新节点问题" class="headerlink" title="优化一次setState多次更新节点问题"></a>优化一次setState多次更新节点问题</h1><p>但是目前如果待更新的节点有子父级的关系，那么处于较低层级的虚拟节点可能会因为父节点的更新而重复更新，而且修改多个props属性值，proxy的set函数也会被调用多次，比如如下例子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    Hello World!</span></span><br><span class="line"><span class="string">    &lt;div style=&quot;background-color: &#123;&#123; color &#125;&#125;&quot;&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            name is &#123;&#123; name &#125;&#125;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            color is &#123;&#123; color &#125;&#125;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;   </span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> root = <span class="title function_">createComponent</span>(template, &#123; <span class="attr">color</span>: <span class="string">&#x27;red&#x27;</span>, <span class="attr">name</span>: <span class="literal">null</span> &#125;);</span><br><span class="line">root.<span class="title function_">update</span>();</span><br><span class="line"><span class="title function_">render</span>(root, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br><span class="line"></span><br><span class="line">root.<span class="title function_">setState</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span>,</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;gray&#x27;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>通过调试可知，name所在的textNode节点被渲染了2次。</p>
+<p>故优化方法可以每一次setState创建一个唯一标记，每次更新完在其虚拟dom上记录该标记，下次调用时如果标记相同则不执行更新：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">update</span>(<span class="params">vdom = <span class="variable language_">this</span></span>) &#123;</span><br><span class="line">        <span class="comment">// 同一个setState只更新一次</span></span><br><span class="line">        <span class="keyword">if</span> (vdom.<span class="property">updateToken</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (vdom.<span class="property">updateToken</span> == <span class="variable language_">this</span>.<span class="property">updateToken</span>) &#123;</span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;已经更新过节点&#x27;</span>, vdom.<span class="property">props</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        vdom.<span class="property">updateToken</span> = <span class="variable language_">this</span>.<span class="property">updateToken</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">curNode</span> = vdom;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更新节点</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">curNode</span> = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> child <span class="keyword">of</span> vdom.<span class="property">children</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="title function_">update</span>(child);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">setState</span>(<span class="params">props</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">updateToken</span> = <span class="title class_">Date</span>.<span class="title function_">now</span>() * <span class="title class_">Math</span>.<span class="title function_">random</span>();</span><br><span class="line">        <span class="comment">// 如果有值不一样会触发proxy的set</span></span><br><span class="line">        <span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="variable language_">this</span>.<span class="property">props</span>, props);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>测试结果如下：<br><img src="/../assets/images/MVVM-step5-1.jpg" alt="运行结果"></p>
+<p>而且采用如上setTimeout形式对结果进行更新，对于多个连续的setState也有优化，在回调更新时均以最后一个setState的updateToken为基准更新一次即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root.<span class="title function_">setState</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span>,</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;gray&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">root.<span class="title function_">setState</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;lzhh&#x27;</span>,</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;green&#x27;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p><img src="/../assets/images/MVVM-step5-2.jpg" alt="运行结果"></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><ol>
+<li>jsx解析虚拟节点对key的引用问题。目前在判断虚拟dom是否使用了某个key，仅通过字符串匹配的方式进行校验，如果关键字在jsx中不作为变量名，则也会被记录的问题（比如字符串<code>&#39;name&#39;</code>）。所以需要根据js语法判断当前字符是否作为变量名被使用，最优的解决方案还是通过babel对其进行语法分析，从而得出使用的变量名有哪些，所以这可能都是vue和react都是用babel进行jsx语法转换的原因吧，文字匹配确实很麻烦。</li>
+</ol>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-14");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-12T07:32:12.000Z" itemprop="datePublished">2022-10-12</time>
+
+    , 最后修改于&nbsp;<time datetime="2022-10-14T04:07:37.476Z" itemprop="dateModified">2022-10-14</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+<a class="post-tags-list-item" href="/tags/%E7%BB%84%E4%BB%B6/" rel="tag">#&nbsp;组件</a>
+
+<a class="post-tags-list-item" href="/tags/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" rel="tag">#&nbsp;观察者模式</a>
+
+<a class="post-tags-list-item" href="/tags/proxy/" rel="tag">#&nbsp;proxy</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step6-实现v-model双向绑定</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step4-组件的抽象与更新</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

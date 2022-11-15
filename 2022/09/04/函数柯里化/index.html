@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>函数柯里化 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="函数柯里化 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/"><meta property="og:locale" content="zh-CN"><meta name="description" content="简介比如一个简单的add相加函数，利用高阶函数的特性将其封装成链式调用形式： 123456function add(a, b, c)&amp;#123;  return a+b+c; &amp;#125;console.log(add(1, 2, 3)); &#x2F;&#x2F; 6&#x2F;&#x2F; console.log(add(1)(2)(3)); &#x2F;&#x2F; 6  最简单的封装即直接利用闭包生写： 123456789function add( - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="js, javascript, 柯里化"><meta property="article:published_time" content="2022-09-04T14:29:58.000Z"><meta property="article:modified_time" content="2022-11-15T14:36:13.217Z"><meta property="og:updated_time" content="2022-11-15T14:36:13.217Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="js, javascript, 柯里化"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/"
+    },
+    "headline": "函数柯里化 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-09-04T14:29:58.000Z",
+    "dateModified": "2022-11-15T14:36:13.217Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "js, javascript, 柯里化",
+    "description": "简介比如一个简单的add相加函数，利用高阶函数的特性将其封装成链式调用形式： 123456function add(a, b, c)&amp;amp;#123;  return a+b+c; &amp;amp;#125;console.log(add(1, 2, 3)); // 6// console.log(add(1)(2)(3)); // 6  最简单的封装即直接利用闭包生写： 123456789function add( - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=函数柯里化" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=函数柯里化&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=函数柯里化" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKQAAACkCAAAAAA83tqdAAACLUlEQVR42u3by27CQBBEUf7/p5NVNoipug1EIe7rTSRA40Pktvsx3L7+wXETKVKkyA9A3sLx835cqBz3n6HnFbkbeTo5Xaytdb8eOa9IkaeAOV30JJDaa+m8IkXGDx8udnIjb2uJFPlM4JyALdlI64gU+WyCcQ+oxdMgYN6WBYm8HJIUYr/x9+3VoshLIHHzKBT7KdF9BPu1rprISyBJE+lUUKWk49REoAWZyN3IVvxTeAuohH74nsi1yPTgbwlsgtCibtREFbkGOUkuaFCdkgvcaBW5FkmHmKmpSpv5ab2nmgMiL4ecDC9bELXPpsbrw6AUuRbZmvStiGqJSWsS1Ma+yJVIkuzShKQNA/DgVORa5GRASYv+9OVJUIoUmW60NAEhg/ZRgIlciZyiSCOrDQLohhSRe5Fk0DlpCLShZ3oQiBSZbsYpkFKyQAdLdXO9yJXIdoGTxhZtRk0CSORe5KRR2oakpHlFij6Ru5GvDN/TA4G83h4aInci242cbCShCTFNTETuRqbiftLYnyJQI0zkWiS5gb+8YRM+CMZdNZGXRLYLuW16b5tLSFKMmqgiVyFTsT75ocY0COM/R+RKJN3sQU+eNjVNg1DkTuQ0kaBB0L4AClCRa5GtsKI3b5JMTDboidyNnDahpknGU0EqUiRETgaeraGfBgAiRZLEFTXkwUZjNOwSuRpJN4TQJv4k8TiuIXItctrAJ4VUK+BIg0DkTuQnHyJFihT5h8c3b3Z15B1v97sAAAAASUVORK5CYII=" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">函数柯里化</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-09-04</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=函数柯里化&url=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=函数柯里化&url=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/09/04/%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKQAAACkCAAAAAA83tqdAAACLUlEQVR42u3by27CQBBEUf7/p5NVNoipug1EIe7rTSRA40Pktvsx3L7+wXETKVKkyA9A3sLx835cqBz3n6HnFbkbeTo5Xaytdb8eOa9IkaeAOV30JJDaa+m8IkXGDx8udnIjb2uJFPlM4JyALdlI64gU+WyCcQ+oxdMgYN6WBYm8HJIUYr/x9+3VoshLIHHzKBT7KdF9BPu1rprISyBJE+lUUKWk49REoAWZyN3IVvxTeAuohH74nsi1yPTgbwlsgtCibtREFbkGOUkuaFCdkgvcaBW5FkmHmKmpSpv5ab2nmgMiL4ecDC9bELXPpsbrw6AUuRbZmvStiGqJSWsS1Ma+yJVIkuzShKQNA/DgVORa5GRASYv+9OVJUIoUmW60NAEhg/ZRgIlciZyiSCOrDQLohhSRe5Fk0DlpCLShZ3oQiBSZbsYpkFKyQAdLdXO9yJXIdoGTxhZtRk0CSORe5KRR2oakpHlFij6Ru5GvDN/TA4G83h4aInci242cbCShCTFNTETuRqbiftLYnyJQI0zkWiS5gb+8YRM+CMZdNZGXRLYLuW16b5tLSFKMmqgiVyFTsT75ocY0COM/R+RKJN3sQU+eNjVNg1DkTuQ0kaBB0L4AClCRa5GtsKI3b5JMTDboidyNnDahpknGU0EqUiRETgaeraGfBgAiRZLEFTXkwUZjNOwSuRpJN4TQJv4k8TiuIXItctrAJ4VUK+BIg0DkTuQnHyJFihT5h8c3b3Z15B1v97sAAAAASUVORK5CYII=" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-number">1.</span> <span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%9F%AF%E9%87%8C%E5%8C%96"><span class="post-toc-number">2.</span> <span class="post-toc-text">柯里化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%A9%E7%94%A8%E9%97%AD%E5%8C%85%E6%9A%82%E5%AD%98%E5%8F%82%E6%95%B0"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">利用闭包暂存参数</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%A9%E7%94%A8bind%E7%9A%84%E5%81%8F%E5%87%BD%E6%95%B0%E6%80%A7%E8%B4%A8%E6%9A%82%E5%AD%98%E5%8F%82%E6%95%B0"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">利用bind的偏函数性质暂存参数</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">使用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%86%99%E6%9F%AF%E9%87%8C%E5%87%BD%E6%95%B0"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">直接写柯里函数</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E8%B0%9C%E4%B9%8B%E6%9F%AF%E9%87%8C%E5%8C%96"><span class="post-toc-number">3.</span> <span class="post-toc-text">谜之柯里化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BC%98%E5%8C%96%E7%89%88%E6%9C%AC"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">优化版本</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%9D%E8%80%83"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">思考</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%90%8E%E8%AE%B0"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">后记</span></a></li></ol></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>比如一个简单的add相加函数，利用高阶函数的特性将其封装成链式调用形式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">a, b, c</span>)&#123;</span><br><span class="line">  <span class="keyword">return</span> a+b+c; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 6</span></span><br><span class="line"><span class="comment">// console.log(add(1)(2)(3)); // 6</span></span><br></pre></td></tr></table></figure>
+
+<p>最简单的封装即直接利用闭包生写：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">a</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">b</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">c</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> a + b + c;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>)); <span class="comment">// 6</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="柯里化"><a href="#柯里化" class="headerlink" title="柯里化"></a>柯里化</h1><p>柯里化工厂，输入一个函数，返回这个函数的柯里化形式。</p>
+<h2 id="利用闭包暂存参数"><a href="#利用闭包暂存参数" class="headerlink" title="利用闭包暂存参数"></a>利用闭包暂存参数</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">curry</span>(<span class="params">fn, args=[]</span>)&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="keyword">let</span> rest = [...args, ...<span class="variable language_">arguments</span>];</span><br><span class="line">    <span class="keyword">if</span>(fn.<span class="property">length</span> == rest.<span class="property">length</span>)&#123;</span><br><span class="line">      <span class="keyword">return</span> fn.<span class="title function_">apply</span>(<span class="variable language_">this</span>, rest); </span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="title function_">curry</span>(fn, rest);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用bind的偏函数性质暂存参数"><a href="#利用bind的偏函数性质暂存参数" class="headerlink" title="利用bind的偏函数性质暂存参数"></a>利用bind的偏函数性质暂存参数</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">curry</span>(<span class="params">fn</span>)&#123;  </span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span>(<span class="params">...args</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span>(fn.<span class="property">length</span> == args.<span class="property">length</span>)&#123;</span><br><span class="line">      <span class="keyword">return</span> fn.<span class="title function_">apply</span>(<span class="variable language_">this</span>, args); </span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="title function_">curry</span>(fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>两种方式各有优缺点吧，第一种可以在生成柯里函数的时候绑定参数，第二种则比较简介和优雅，省去了用于闭包存参数的数组。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">a, b, c</span>)&#123;</span><br><span class="line">  <span class="keyword">return</span> a+b+c; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> curryAdd = <span class="title function_">curry</span>(add);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">curryAdd</span>(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="直接写柯里函数"><a href="#直接写柯里函数" class="headerlink" title="直接写柯里函数"></a>直接写柯里函数</h2><p>不利用工厂的方式，直接书写柯里函数，主要思路仍旧是创建一个函数，返回该函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">...args</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> fn = <span class="keyword">function</span>(<span class="params">...args2</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (args2.<span class="property">length</span> === <span class="number">3</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> args2.<span class="title function_">reduce</span>(<span class="function">(<span class="params">pre, cur</span>) =&gt;</span> pre+cur, <span class="number">0</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args2);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args)(); <span class="comment">// 这里调用一下，避免只只有一层柯里调用时，fn未调用的情况</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="谜之柯里化"><a href="#谜之柯里化" class="headerlink" title="谜之柯里化"></a>谜之柯里化</h1><p>最近面试还遇到了一个柯里化问题，即实现自由参数长度的add函数，使得如下成立：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 柯里化实现一个add</span></span><br><span class="line"><span class="comment">// add(1)(2)(3) == 6</span></span><br><span class="line"><span class="comment">// add(1, 2, 3)(4, 5)(6) == 21</span></span><br><span class="line"><span class="comment">// add(1, 2, 3)(4, 5) == 15</span></span><br></pre></td></tr></table></figure>
+<p>因为不能确定柯里化的长度，即只能在调用的时候确定返回数字，运算的时候仍然返回函数，在面试官的提醒下，调用的时候会触发toString方法，可以通过重载toString方法实现，但是当时没做出来，后续思考后实现如下。</p>
+<p>依据直接书写柯里化的方法，重载返回的fn的toString方法，将计算结果的方法写在fn.__proto__的toString中，并且要定义在fn里面，以利用闭包获取参数。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">...args</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> fn = <span class="keyword">function</span>(<span class="params">...args2</span>) &#123;</span><br><span class="line">        <span class="comment">// toString写在里面以用闭包获取参数</span></span><br><span class="line">        <span class="comment">// 重载原型的toString实现在==调用时计算类型</span></span><br><span class="line">        fn.<span class="property">__proto__</span>.<span class="property">toString</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> args2.<span class="title function_">reduce</span>(<span class="function">(<span class="params">pre, cur</span>) =&gt;</span> pre+cur, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args2);</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args)();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>) == <span class="number">6</span>)</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>, <span class="number">5</span>)(<span class="number">6</span>) == <span class="number">21</span>)</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>, <span class="number">5</span>) == <span class="number">15</span>)</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="优化版本"><a href="#优化版本" class="headerlink" title="优化版本"></a>优化版本</h2><p>可进一步优化防止污染Function.prototype的toString：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">...args</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> fn = <span class="keyword">function</span>(<span class="params">...args2</span>) &#123;</span><br><span class="line">        fn.<span class="property">toString</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> args2.<span class="title function_">reduce</span>(<span class="function">(<span class="params">pre, cur</span>) =&gt;</span> pre+cur, <span class="number">0</span>);</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="comment">// 因为每次都用bind返回了一个新的fn，所以需要将旧fn上的toString绑定到bind新生成的函数上</span></span><br><span class="line">        <span class="comment">// 这里将拷贝原本fn上的所有可枚举属性到由bind新生成的函数</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args2), fn);</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> fn.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args)();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>) == <span class="number">6</span>) <span class="comment">// true</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>, <span class="number">5</span>)(<span class="number">6</span>) == <span class="number">21</span>) <span class="comment">// true</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>, <span class="number">5</span>) == <span class="number">15</span>) <span class="comment">// true</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>) == <span class="number">6</span>) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>睡了一觉白天又想到，其实也可以不用创建fn，直接返回一个bind，然后在外面绑定toString方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">...args</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(add.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args), add);</span><br><span class="line">&#125;</span><br><span class="line">add.<span class="property">toString</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="variable language_">this</span>); <span class="comment">// 从外部获取不到add的参数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但主要问题是，这样在调用toString的方法时，不能通过this获取add的偏函数参数，之前用fn写到里面的原因是利用闭包暂存函数的参数，所以将计就计的话可以把参数暂存到add函数的一个属性args上：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">...args</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(add.<span class="title function_">bind</span>(<span class="variable language_">this</span>, ...args), add, &#123; args &#125;); <span class="comment">// 拷贝args</span></span><br><span class="line">&#125;</span><br><span class="line">add.<span class="property">toString</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">args</span>.<span class="title function_">reduce</span>(<span class="function">(<span class="params">pre, cur</span>) =&gt;</span> pre+cur, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>) == <span class="number">6</span>) <span class="comment">// true</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>, <span class="number">5</span>)(<span class="number">6</span>) == <span class="number">21</span>) <span class="comment">// true</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>, <span class="number">5</span>) == <span class="number">15</span>) <span class="comment">// true</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>) == <span class="number">6</span>) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<p>两行return完美实现！</p>
+<p>但是说这样实现的话，会污染add的一个属性名args用来传递参数，并且在函数外部也可以访问内部的参数，还会涉及到修改了args的问题，算是一种从外部访问函数内部参数的次优解吧。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>后来在面试中又遇到了类似的题目，在面试官的提示下写了出来，发现之前想复杂了，只需要把输入的参数暂存就好。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 实现一个累加器</span></span><br><span class="line"><span class="comment"> * add(1,2)(3).sumOf()</span></span><br><span class="line"><span class="comment"> * add(1)(2,3).sumOf()</span></span><br><span class="line"><span class="comment"> * add(1)(2)(3).sumOf()</span></span><br><span class="line"><span class="comment"> * add(1,2,3).sumOf()</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">...inArgs</span>) &#123;</span><br><span class="line">    <span class="comment">// 所有输入参数存在一个变量中</span></span><br><span class="line">    <span class="keyword">let</span> args = [...inArgs];</span><br><span class="line">    <span class="keyword">let</span> fn = <span class="keyword">function</span>(<span class="params">...inArgs2</span>) &#123;</span><br><span class="line">        args = [...args, ...inArgs2];</span><br><span class="line">        <span class="keyword">return</span> fn;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    fn.<span class="property">sumOf</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> args.<span class="title function_">reduce</span>(<span class="function">(<span class="params">pre, cur</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> pre + cur;</span><br><span class="line">        &#125;, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> fn;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>)(<span class="number">3</span>).<span class="title function_">sumOf</span>());</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>)(<span class="number">2</span>, <span class="number">3</span>).<span class="title function_">sumOf</span>());</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>).<span class="title function_">sumOf</span>());</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).<span class="title function_">sumOf</span>());</span><br></pre></td></tr></table></figure>
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-11-15");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-09-04T14:29:58.000Z" itemprop="datePublished">2022-09-04</time>
+
+    , 最后修改于&nbsp;<time datetime="2022-11-15T14:36:13.217Z" itemprop="dateModified">2022-11-15</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/js/" rel="tag">#&nbsp;js</a>
+
+<a class="post-tags-list-item" href="/tags/javascript/" rel="tag">#&nbsp;javascript</a>
+
+<a class="post-tags-list-item" href="/tags/%E6%9F%AF%E9%87%8C%E5%8C%96/" rel="tag">#&nbsp;柯里化</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/09/28/Promise%E5%B9%B6%E5%8F%91%E9%99%90%E5%88%B6/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">Promise并发限制</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/08/28/%E6%AD%BB%E9%94%81/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">死锁</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

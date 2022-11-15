@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step1-HTML与虚拟dom转换 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step1-HTML与虚拟dom转换 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/"><meta property="og:locale" content="zh-CN"><meta name="description" content="虚拟dom节点123456789101112function createElement(type, props, children) &amp;#123;    return new Element(type, props, children);&amp;#125;class Element &amp;#123;    constructor(type, props, children) &amp;#123;        t - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, 虚拟dom, MVVM, vue, react"><meta property="article:published_time" content="2022-10-06T07:42:17.000Z"><meta property="article:modified_time" content="2022-10-11T10:28:05.872Z"><meta property="og:updated_time" content="2022-10-11T10:28:05.872Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, 虚拟dom, MVVM, vue, react"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/"
+    },
+    "headline": "手写MVVM框架-step1-HTML与虚拟dom转换 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-06T07:42:17.000Z",
+    "dateModified": "2022-10-11T10:28:05.872Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, 虚拟dom, MVVM, vue, react",
+    "description": "虚拟dom节点123456789101112function createElement(type, props, children) &amp;amp;#123;    return new Element(type, props, children);&amp;amp;#125;class Element &amp;amp;#123;    constructor(type, props, children) &amp;amp;#123;        t - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step1-HTML与虚拟dom转换" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step1-HTML与虚拟dom转换&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step1-HTML与虚拟dom转换" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADsUlEQVR42u3dwXLbMAxFUf3/T7fbxBHxLuRYRDTXm0xdWebRDEkQQNrj3wNfhyhRokSJehzqKF7fPvDy/uras2tOB/By3defr9fRcYoSNQW1+lLy5+r9swdxhl39/dlnq3GKEjUJVQ3gbHKnib1aKMhCkxaTFVaUqCegVhN+9fllMBoWB1GinoaqNsIVlgTIVdCcFhhRoiaj0k2qCU4Oh+8GsL8apYsS9WFUNbEn/fy1bJIoUR9ExaR78zDXSdSQQ+RHqh6iRH0QVU1EMkASyJJ7rgJaMj5Roqah0qSuCm7VpL5SdKsSL6lgIErUBBQ5yJGE5AqZJj9JuqTgQJSoaahq0ncSJikJSQJa+rBjlC5K1EbUlYmeIJ3mEDIGghQlajKKHtLo++Qg2F0sfmBFiRqCIkVm2nyVAlNSDO8sQGVAK0rUJlQKPklROSVjYtKk8R2XTr6iRN2Iok0aNDlCigvdphCU/BElagAqHfgouvt5MmiSpEEdL6JE3YjqFqRTEwlNmnQL3FUyVZSoaSiSrO80z6cHRAsHNBgQJWoyiiQ/yMSn96sK5+QhihI1EUWTl6SgTTdwOlCStBElahKq29ibCmwkkU+S/jSoXp58RYnahGol4I/8D2CkQh5q8KUIWnQTJWoDKiUpY9KjeX2n2Yt8ryhRU1B0c0sbLTlM0gHTBUeUqKkomkChRWfysLqLFDloihI1AUWTLynJWA2k2mRJ4Eqbv0SJmoQih0BSIHg7KD3yL3uiDK0oUcNQVwpjnYap9AA6DWGiRE1DkU2SFtdI4xRJXqYCxOUuMlGibkLRIgFZYDoFg9R8lTbocqEQJWoTiiROyIJCB5uKBeRgWCYzRYnaiCKJEnpgTJs3WShW348WLFGihqJIM+E7CRayUNDCBF4oRIm6CUWKZ6sD4pWBkAeRinOoQCBK1CZUKoKlSdpq3jjyf+RIN//ThytK1BAUCSirQLNT6CZFPVps+3FPUaIGoKovTMUwEpySxCRdcOK9RIkahIrB4tH7Zf8rDVm0cQQfEkWJ2oBKILLxkgTOlQQnPXSKEjUJlV7khp3G3pTEIQVwFNCKErUJdaU4QJqpUqKEJEzbTcWiRA1BkeIXLS7TzZwUHOiCI0rURBQ91KVEZ1qASEDbCWpFifqLKFrUps1RqcmLXtsqZIsSNQjV2YBTMwgpANCFpVWdFyXqZhQNKqvJ3SnU0QC6NU5RooagSNCYNkzaYJWKdp3EaBnQihK1CfWklyhRokSJeszrP7RyEW3IcnLYAAAAAElFTkSuQmCC" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step1-HTML与虚拟dom转换</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-06</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step1-HTML与虚拟dom转换&url=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step1-HTML与虚拟dom转换&url=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADsUlEQVR42u3dwXLbMAxFUf3/T7fbxBHxLuRYRDTXm0xdWebRDEkQQNrj3wNfhyhRokSJehzqKF7fPvDy/uras2tOB/By3defr9fRcYoSNQW1+lLy5+r9swdxhl39/dlnq3GKEjUJVQ3gbHKnib1aKMhCkxaTFVaUqCegVhN+9fllMBoWB1GinoaqNsIVlgTIVdCcFhhRoiaj0k2qCU4Oh+8GsL8apYsS9WFUNbEn/fy1bJIoUR9ExaR78zDXSdSQQ+RHqh6iRH0QVU1EMkASyJJ7rgJaMj5Roqah0qSuCm7VpL5SdKsSL6lgIErUBBQ5yJGE5AqZJj9JuqTgQJSoaahq0ncSJikJSQJa+rBjlC5K1EbUlYmeIJ3mEDIGghQlajKKHtLo++Qg2F0sfmBFiRqCIkVm2nyVAlNSDO8sQGVAK0rUJlQKPklROSVjYtKk8R2XTr6iRN2Iok0aNDlCigvdphCU/BElagAqHfgouvt5MmiSpEEdL6JE3YjqFqRTEwlNmnQL3FUyVZSoaSiSrO80z6cHRAsHNBgQJWoyiiQ/yMSn96sK5+QhihI1EUWTl6SgTTdwOlCStBElahKq29ibCmwkkU+S/jSoXp58RYnahGol4I/8D2CkQh5q8KUIWnQTJWoDKiUpY9KjeX2n2Yt8ryhRU1B0c0sbLTlM0gHTBUeUqKkomkChRWfysLqLFDloihI1AUWTLynJWA2k2mRJ4Eqbv0SJmoQih0BSIHg7KD3yL3uiDK0oUcNQVwpjnYap9AA6DWGiRE1DkU2SFtdI4xRJXqYCxOUuMlGibkLRIgFZYDoFg9R8lTbocqEQJWoTiiROyIJCB5uKBeRgWCYzRYnaiCKJEnpgTJs3WShW348WLFGihqJIM+E7CRayUNDCBF4oRIm6CUWKZ6sD4pWBkAeRinOoQCBK1CZUKoKlSdpq3jjyf+RIN//ThytK1BAUCSirQLNT6CZFPVps+3FPUaIGoKovTMUwEpySxCRdcOK9RIkahIrB4tH7Zf8rDVm0cQQfEkWJ2oBKILLxkgTOlQQnPXSKEjUJlV7khp3G3pTEIQVwFNCKErUJdaU4QJqpUqKEJEzbTcWiRA1BkeIXLS7TzZwUHOiCI0rURBQ91KVEZ1qASEDbCWpFifqLKFrUps1RqcmLXtsqZIsSNQjV2YBTMwgpANCFpVWdFyXqZhQNKqvJ3SnU0QC6NU5RooagSNCYNkzaYJWKdp3EaBnQihK1CfWklyhRokSJeszrP7RyEW3IcnLYAAAAAElFTkSuQmCC" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9Fdom%E8%8A%82%E7%82%B9"><span class="post-toc-number">1.</span> <span class="post-toc-text">虚拟dom节点</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">问题定义</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#HTML%E6%96%87%E6%9C%AC%E8%BD%AC%E8%99%9A%E6%8B%9Fdom"><span class="post-toc-number">3.</span> <span class="post-toc-text">HTML文本转虚拟dom</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HTML%E6%96%87%E6%9C%AC%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">HTML文本词法分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A0%B9%E6%8D%AE%E5%B1%82%E7%BA%A7%E6%9E%84%E5%BB%BA%E8%99%9A%E6%8B%9Fdom%E6%A0%91"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">根据层级构建虚拟dom树</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%A0%B9%E6%8D%AE%E8%99%9A%E6%8B%9Fdom%E6%9E%84%E5%BB%BAHTML%E6%96%87%E6%9C%AC"><span class="post-toc-number">4.</span> <span class="post-toc-text">根据虚拟dom构建HTML文本</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">5.</span> <span class="post-toc-text">测试</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">问题</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%94%B9%E8%BF%9B"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">改进</span></a></li></ol></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="虚拟dom节点"><a href="#虚拟dom节点" class="headerlink" title="虚拟dom节点"></a>虚拟dom节点</h1><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createElement</span>(<span class="params">type, props, children</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Element</span>(type, props, children);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Element</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">type, props, children</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">type</span> = type === <span class="literal">undefined</span> ? <span class="string">&#x27;&#x27;</span> : type;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">props</span> = props === <span class="literal">undefined</span> ? &#123;&#125; : props;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">children</span> = children === <span class="literal">undefined</span> ? [] : children;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">parent</span> = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>参数<ul>
+<li>type: 指定元素的标签类型，如’li’, ‘div’等</li>
+<li>props: 表示指定元素身上的属性，如class, style, 自定义属性等</li>
+<li>children: 子节点，数组形式</li>
+<li>parent: 父节点，指向父虚拟节点的地址，方便处理</li>
+</ul>
+</li>
+</ul>
+<h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><ol>
+<li>给定一串html文本，实现一个trans函数将html文本转换成对应的虚拟dom对象。</li>
+<li>给定一组虚拟dom对象，实现一个函数toHTML，将其转化成对应的HTML文本。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        Hello World!</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            表格</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;姓 名&lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;年 龄&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">trans</span>(template));</span><br><span class="line"><span class="comment">// [</span></span><br><span class="line"><span class="comment">//  Element &#123;</span></span><br><span class="line"><span class="comment">//     type: &#x27;div&#x27;,</span></span><br><span class="line"><span class="comment">//     props: &#123; value: &#x27;Hello World!&#x27; &#125;,</span></span><br><span class="line"><span class="comment">//     children: [],</span></span><br><span class="line"><span class="comment">//     parent: null</span></span><br><span class="line"><span class="comment">//     &#125;,</span></span><br><span class="line"><span class="comment">//  Element &#123;</span></span><br><span class="line"><span class="comment">//     type: &#x27;div&#x27;,</span></span><br><span class="line"><span class="comment">//     props: &#123;&#125;,</span></span><br><span class="line"><span class="comment">//     children: [ &#123;</span></span><br><span class="line"><span class="comment">//         type: &#x27;div&#x27;,</span></span><br><span class="line"><span class="comment">//         props: &#123; value: &#x27;表格&#x27; &#125;,</span></span><br><span class="line"><span class="comment">//         children: [],</span></span><br><span class="line"><span class="comment">//         parent: [[Element]]</span></span><br><span class="line"><span class="comment">//     &#125;, &#123;</span></span><br><span class="line"><span class="comment">//         type: &#x27;div&#x27;,</span></span><br><span class="line"><span class="comment">//         props: &#123;&#125;,</span></span><br><span class="line"><span class="comment">//         children: [ [[Element]], [[Element]] ]</span></span><br><span class="line"><span class="comment">//         parent: [[Element]],</span></span><br><span class="line"><span class="comment">//     &#125; ],</span></span><br><span class="line"><span class="comment">//     parent: null</span></span><br><span class="line"><span class="comment">//     &#125;</span></span><br><span class="line"><span class="comment">// ]</span></span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">toHTML</span>(<span class="title function_">trans</span>(template)));</span><br><span class="line"><span class="comment">// &lt;div&gt;</span></span><br><span class="line"><span class="comment">//   Hello World!</span></span><br><span class="line"><span class="comment">// &lt;/div&gt;</span></span><br><span class="line"><span class="comment">// &lt;div&gt;</span></span><br><span class="line"><span class="comment">//   &lt;div&gt;</span></span><br><span class="line"><span class="comment">//     表格</span></span><br><span class="line"><span class="comment">//   &lt;/div&gt;</span></span><br><span class="line"><span class="comment">//   &lt;div&gt;</span></span><br><span class="line"><span class="comment">//     &lt;ul&gt;</span></span><br><span class="line"><span class="comment">//       &lt;li&gt;</span></span><br><span class="line"><span class="comment">//         姓 名</span></span><br><span class="line"><span class="comment">//       &lt;/li&gt;</span></span><br><span class="line"><span class="comment">//       &lt;li&gt;</span></span><br><span class="line"><span class="comment">//         年 龄</span></span><br><span class="line"><span class="comment">//       &lt;/li&gt;</span></span><br><span class="line"><span class="comment">//     &lt;/ul&gt;</span></span><br><span class="line"><span class="comment">//   &lt;/div&gt;</span></span><br><span class="line"><span class="comment">// &lt;/div&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="HTML文本转虚拟dom"><a href="#HTML文本转虚拟dom" class="headerlink" title="HTML文本转虚拟dom"></a>HTML文本转虚拟dom</h1><p>具体可将转化过程分为两部分，第一部分是对HTML文本进行词法分析，类似于括号匹配，根据HTML文本规则进行解析；第二部分是构建虚拟dom树，根据HTML的层次关系构建虚拟dom对象。</p>
+<h2 id="HTML文本词法分析"><a href="#HTML文本词法分析" class="headerlink" title="HTML文本词法分析"></a>HTML文本词法分析</h2><p>大致流程是：</p>
+<ol>
+<li>对HTML文本进行空格的预处理。</li>
+<li>匹配每一组尖括号包裹的文本，分别有三种情况（&lt;div&gt;, &lt;div&#x2F;&gt;, &lt;&#x2F;div&gt;）。</li>
+<li>在词法分析过程中通过栈stack判断标签配对的一致性。</li>
+<li>在解析过程中将解析到的内容交给vEleHandle处理构建虚拟dom对象。<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 合法标签关键词</span></span><br><span class="line"><span class="keyword">let</span> token = <span class="keyword">new</span> <span class="title class_">Set</span>([<span class="string">&#x27;div&#x27;</span>, <span class="string">&#x27;ul&#x27;</span>, <span class="string">&#x27;li&#x27;</span>, <span class="string">&#x27;p&#x27;</span>]);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">trans</span>(<span class="params">template</span>) &#123;</span><br><span class="line">    template = template.<span class="title function_">replace</span>(<span class="regexp">/[\n]+/g</span>, <span class="string">&#x27;&#x27;</span>); <span class="comment">// 去除换行</span></span><br><span class="line">    template = template.<span class="title function_">replace</span>(<span class="regexp">/[ ]+/g</span>, <span class="string">&#x27; &#x27;</span>); <span class="comment">// 仅保留一个空格</span></span><br><span class="line">    <span class="keyword">let</span> vEleHandle = <span class="keyword">new</span> <span class="title class_">CreateElementHandle</span>(); <span class="comment">// 构建虚拟dom</span></span><br><span class="line">    <span class="keyword">let</span> stack = []; <span class="comment">// 标签匹配栈</span></span><br><span class="line">    <span class="keyword">let</span> valueIdx = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">let</span> idx = <span class="number">0</span>; <span class="comment">// 词法分析</span></span><br><span class="line">    <span class="keyword">while</span> (idx &lt; template.<span class="property">length</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (template[idx] == <span class="string">&#x27;&lt;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">let</span> end = template.<span class="title function_">indexOf</span>(<span class="string">&#x27;&gt;&#x27;</span>, idx);</span><br><span class="line">            <span class="keyword">if</span> (end == -<span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`语句不合法<span class="subst">$&#123;template.slice(idx)&#125;</span>`</span>);</span><br><span class="line">            &#125; </span><br><span class="line">            &#123; <span class="comment">// 添加虚拟dom的值</span></span><br><span class="line">                <span class="keyword">let</span> value = template.<span class="title function_">slice</span>(valueIdx, idx).<span class="title function_">trim</span>();</span><br><span class="line">                value &amp;&amp; vEleHandle.<span class="title function_">addValue</span>(value);</span><br><span class="line">                valueIdx = end + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (template[end - <span class="number">1</span>] == <span class="string">&#x27;/&#x27;</span>) &#123; <span class="comment">// 单个标签结尾符号 &lt;div/&gt;</span></span><br><span class="line">                <span class="keyword">let</span> type = template.<span class="title function_">slice</span>(idx + <span class="number">1</span>, end - <span class="number">1</span>).<span class="title function_">trim</span>();</span><br><span class="line">                <span class="keyword">if</span> (!token.<span class="title function_">has</span>(type)) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`未找到对应标签名<span class="subst">$&#123;type&#125;</span>`</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                vEleHandle.<span class="title function_">addElements</span>(type, &#123;&#125;, [], stack.<span class="property">length</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (template[idx + <span class="number">1</span>] == <span class="string">&#x27;/&#x27;</span>) &#123; <span class="comment">// 双标签结尾符号 &lt;/div&gt;</span></span><br><span class="line">                <span class="keyword">let</span> type = template.<span class="title function_">slice</span>(idx + <span class="number">2</span>, end).<span class="title function_">trim</span>();</span><br><span class="line">                <span class="keyword">if</span> (!token.<span class="title function_">has</span>(type)) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`未找到对应标签名<span class="subst">$&#123;type&#125;</span>`</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">let</span> lastType = stack.<span class="title function_">pop</span>();</span><br><span class="line">                <span class="keyword">if</span> (lastType !== type) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`标签层级不匹配<span class="subst">$&#123;lastType&#125;</span> <span class="subst">$&#123;type&#125;</span>`</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; <span class="comment">// 标签开头 &lt;div&gt;</span></span><br><span class="line">                <span class="keyword">let</span> type = template.<span class="title function_">slice</span>(idx + <span class="number">1</span>, end).<span class="title function_">trim</span>();</span><br><span class="line">                <span class="keyword">if</span> (!token.<span class="title function_">has</span>(type)) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`未找到对应标签名<span class="subst">$&#123;type&#125;</span>`</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                vEleHandle.<span class="title function_">addElements</span>(type, &#123;&#125;, [], stack.<span class="property">length</span>);</span><br><span class="line">                stack.<span class="title function_">push</span>(type);</span><br><span class="line">            &#125;</span><br><span class="line">            idx = end + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            idx++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (stack.<span class="property">length</span> != <span class="number">0</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`标签层级不匹配`</span>);</span><br><span class="line">    <span class="keyword">return</span> vEleHandle.<span class="title function_">getElements</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="根据层级构建虚拟dom树"><a href="#根据层级构建虚拟dom树" class="headerlink" title="根据层级构建虚拟dom树"></a>根据层级构建虚拟dom树</h2><p>整体思路是：</p>
+<ol>
+<li>维护上一次添加进来的节点和上一个节点的层级。</li>
+<li>判断新添加进来节点的层级：<ul>
+<li>如果新层级 等于 上一个节点层级，作为上一个节点的兄弟节点加入；</li>
+<li>如果新层级 小于 上一个节点层级，作为对应层级的兄弟节点加入；</li>
+<li>如果新层级 大于 上一个节点层级，作为上一节点的子节点加入。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CreateElementHandle</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">lastLevel</span> = <span class="number">0</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">lastDom</span> = <span class="literal">null</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">doms</span> = []; <span class="comment">// 虚拟dom</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">root</span> = <span class="title function_">createElement</span>(<span class="string">&#x27;div&#x27;</span>, &#123;&#125;, <span class="variable language_">this</span>.<span class="property">doms</span>); <span class="comment">// 为所有虚拟dom创建一个根节点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">addElements</span>(<span class="params">type, props, children, level</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (level &lt; <span class="number">0</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`层级错误: <span class="subst">$&#123;level&#125;</span>`</span>);</span><br><span class="line">        <span class="keyword">if</span> (level == <span class="number">0</span>) &#123; <span class="comment">// 根节点</span></span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastLevel</span> = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">let</span> vdom = <span class="title function_">createElement</span>(type, props, children);</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">doms</span>.<span class="title function_">push</span>(vdom);</span><br><span class="line">            vdom.<span class="property">parent</span> = <span class="literal">null</span>;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span> = vdom;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (level == <span class="variable language_">this</span>.<span class="property">lastLevel</span>) &#123; <span class="comment">// 同级兄弟节点</span></span><br><span class="line">            <span class="keyword">let</span> vdom = <span class="title function_">createElement</span>(type, props, children);</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">parent</span>.<span class="property">children</span>.<span class="title function_">push</span>(vdom);</span><br><span class="line">            vdom.<span class="property">parent</span> = <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">parent</span>;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span> = vdom;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (level &gt; <span class="variable language_">this</span>.<span class="property">lastLevel</span>) &#123; <span class="comment">// 子节点</span></span><br><span class="line">            <span class="keyword">if</span> (level - <span class="variable language_">this</span>.<span class="property">lastLevel</span> &gt; <span class="number">1</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`层级错误add <span class="subst">$&#123;level&#125;</span> from <span class="subst">$&#123;<span class="variable language_">this</span>.lastLevel&#125;</span>:<span class="subst">$&#123;<span class="variable language_">this</span>.lastDom.type&#125;</span>`</span>);</span><br><span class="line">            <span class="keyword">let</span> vdom = <span class="title function_">createElement</span>(type, props, children);</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">children</span>.<span class="title function_">push</span>(vdom);</span><br><span class="line">            vdom.<span class="property">parent</span> = <span class="variable language_">this</span>.<span class="property">lastDom</span>;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span> = vdom;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastLevel</span> = level;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (level &lt; <span class="variable language_">this</span>.<span class="property">lastLevel</span>) &#123; <span class="comment">// 祖先节点</span></span><br><span class="line">            <span class="keyword">let</span> dis = <span class="variable language_">this</span>.<span class="property">lastLevel</span> - level;</span><br><span class="line">            <span class="keyword">while</span> (dis) &#123;</span><br><span class="line">                dis--;</span><br><span class="line">                <span class="variable language_">this</span>.<span class="property">lastDom</span> = <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">parent</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">let</span> vdom = <span class="title function_">createElement</span>(type, props, children);</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">parent</span>.<span class="property">children</span>.<span class="title function_">push</span>(vdom); <span class="comment">// 放置于lastDom同级</span></span><br><span class="line">            vdom.<span class="property">parent</span> = <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">parent</span>;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span> = vdom;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastLevel</span> = level;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">getElements</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">root</span>; <span class="comment">// 返回外层根节点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">addValue</span>(<span class="params">value</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">props</span>.<span class="property">value</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">props</span>.<span class="property">value</span> += value;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="property">lastDom</span>.<span class="property">props</span>.<span class="property">value</span> = value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="根据虚拟dom构建HTML文本"><a href="#根据虚拟dom构建HTML文本" class="headerlink" title="根据虚拟dom构建HTML文本"></a>根据虚拟dom构建HTML文本</h1><p>深度遍历+层级记录</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">toHTML</span>(<span class="params">root, tabLen = <span class="number">4</span></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">let</span> tab = <span class="string">&#x27;&#x27;</span>; <span class="comment">// 缩进</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">dfs</span>(<span class="params">node</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!node) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">const</span> type = node.<span class="property">type</span>;</span><br><span class="line">        <span class="keyword">const</span> value = node.<span class="property">props</span>.<span class="property">value</span> ? node.<span class="property">props</span>.<span class="property">value</span> : <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">        res += tab + <span class="string">`&lt;<span class="subst">$&#123;type&#125;</span>&gt;\n`</span>;</span><br><span class="line">        <span class="keyword">if</span> (value) res += <span class="string">`<span class="subst">$&#123;tab&#125;</span>  <span class="subst">$&#123;value&#125;</span>\n`</span>;</span><br><span class="line">        tab += <span class="string">&#x27; &#x27;</span>.<span class="title function_">repeat</span>(tabLen);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> child <span class="keyword">of</span> node.<span class="property">children</span>) &#123;</span><br><span class="line">            <span class="title function_">dfs</span>(child);</span><br><span class="line">        &#125;</span><br><span class="line">        tab = tab.<span class="title function_">slice</span>(tabLen);</span><br><span class="line">        res += tab + <span class="string">`&lt;/<span class="subst">$&#123;type&#125;</span>&gt;\n`</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title function_">dfs</span>(root);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        Hello World!</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            表格</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;姓 名&lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;年 龄&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="keyword">let</span> tree = <span class="title function_">trans</span>(template);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">toHTML</span>(tree));</span><br><span class="line"><span class="comment">// &lt;div&gt;</span></span><br><span class="line"><span class="comment">//   Hello World!</span></span><br><span class="line"><span class="comment">// &lt;/div&gt;</span></span><br><span class="line"><span class="comment">// &lt;div&gt;</span></span><br><span class="line"><span class="comment">//     &lt;div&gt;</span></span><br><span class="line"><span class="comment">//       表格</span></span><br><span class="line"><span class="comment">//     &lt;/div&gt;</span></span><br><span class="line"><span class="comment">//     &lt;div&gt;</span></span><br><span class="line"><span class="comment">//         &lt;ul&gt;</span></span><br><span class="line"><span class="comment">//             &lt;li&gt;</span></span><br><span class="line"><span class="comment">//               姓 名</span></span><br><span class="line"><span class="comment">//             &lt;/li&gt;</span></span><br><span class="line"><span class="comment">//             &lt;li&gt;</span></span><br><span class="line"><span class="comment">//               年 龄</span></span><br><span class="line"><span class="comment">//             &lt;/li&gt;</span></span><br><span class="line"><span class="comment">//         &lt;/ul&gt;</span></span><br><span class="line"><span class="comment">//     &lt;/div&gt;</span></span><br><span class="line"><span class="comment">// &lt;/div&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>未考虑标签节点和直接文字并列的情况，如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        hi!</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    Hello World!</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="keyword">let</span> tree = <span class="title function_">trans</span>(template);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">toHTML</span>(tree));</span><br><span class="line"><span class="comment">// &lt;div&gt;</span></span><br><span class="line"><span class="comment">//     &lt;div&gt;</span></span><br><span class="line"><span class="comment">//       hi!Hello World!</span></span><br><span class="line"><span class="comment">//     &lt;/div&gt;</span></span><br><span class="line"><span class="comment">// &lt;/div&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h2><p>原因出在虚拟dom添加值的地方（trans函数第19行）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="comment">// 添加虚拟dom的值</span></span><br><span class="line">    <span class="keyword">let</span> value = template.<span class="title function_">slice</span>(valueIdx, idx).<span class="title function_">trim</span>();</span><br><span class="line">    value &amp;&amp; vEleHandle.<span class="title function_">addValue</span>(value);</span><br><span class="line">    valueIdx = end + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里addValue只对最后加进去的节点进行值得添加，在标签外面的文本自然就被添加进上方最近的节点当中，解决方法是对每一个单独的文字用一个新的虚拟dom节点包裹，如使用&lt;text&gt;标签：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="comment">// 添加虚拟dom的值</span></span><br><span class="line">    <span class="keyword">let</span> value = template.<span class="title function_">slice</span>(valueIdx, idx).<span class="title function_">trim</span>();</span><br><span class="line">    value &amp;&amp; vEleHandle.<span class="title function_">addElements</span>(<span class="string">&#x27;text&#x27;</span>, &#123; value &#125;, [], stack.<span class="property">length</span>);</span><br><span class="line">    valueIdx = end + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这时生成的文本是带有&lt;text&gt;标签的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">text</span>&gt;</span></span><br><span class="line">          hi!</span><br><span class="line">        <span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span></span><br><span class="line">      Hello World!</span><br><span class="line">    <span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>然后只需在生成的文本最后（19行、20行）正则匹配删除掉&lt;text&gt;标签：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">toHTML</span>(<span class="params">root, tabLen = <span class="number">4</span></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">let</span> tab = <span class="string">&#x27;&#x27;</span>; <span class="comment">// 缩进</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">dfs</span>(<span class="params">node</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!node) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">const</span> type = node.<span class="property">type</span>;</span><br><span class="line">        <span class="keyword">const</span> value = node.<span class="property">props</span>.<span class="property">value</span> ? node.<span class="property">props</span>.<span class="property">value</span> : <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">        res += tab + <span class="string">`&lt;<span class="subst">$&#123;type&#125;</span>&gt;\n`</span>;</span><br><span class="line">        <span class="keyword">if</span> (value) res += <span class="string">`<span class="subst">$&#123;tab&#125;</span>  <span class="subst">$&#123;value&#125;</span>\n`</span>;</span><br><span class="line">        tab += <span class="string">&#x27; &#x27;</span>.<span class="title function_">repeat</span>(tabLen);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> child <span class="keyword">of</span> node.<span class="property">children</span>) &#123;</span><br><span class="line">            <span class="title function_">dfs</span>(child);</span><br><span class="line">        &#125;</span><br><span class="line">        tab = tab.<span class="title function_">slice</span>(tabLen);</span><br><span class="line">        res += tab + <span class="string">`&lt;/<span class="subst">$&#123;type&#125;</span>&gt;\n`</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title function_">dfs</span>(root);</span><br><span class="line">    res = res.<span class="title function_">replace</span>(<span class="regexp">/[ ]*&lt;text&gt;\n/g</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">    res = res.<span class="title function_">replace</span>(<span class="regexp">/[ ]*&lt;\/text&gt;\n/g</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">          hi!</span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">      Hello World!</span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>成功复原HTML文本！</p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-11");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-06T07:42:17.000Z" itemprop="datePublished">2022-10-06</time>
+
+    , 最后修改于&nbsp;<time datetime="2022-10-11T10:28:05.872Z" itemprop="dateModified">2022-10-11</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/%E8%99%9A%E6%8B%9Fdom/" rel="tag">#&nbsp;虚拟dom</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step2-props解析和render</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/09/28/Promise%E5%B9%B6%E5%8F%91%E9%99%90%E5%88%B6/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">Promise并发限制</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

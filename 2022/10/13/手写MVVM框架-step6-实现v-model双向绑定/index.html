@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step6-实现v-model双向绑定 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step6-实现v-model双向绑定 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/"><meta property="og:locale" content="zh-CN"><meta name="description" content="问题定义上一步通过Proxy监听数据的变化，从而对dom节点进行更新，相当于是单向数据驱动的更新。现在想通过v-model标签，实现vue双向绑定的更新机制。 具体来说，通过添加input标签的v-model属性标识绑定的值，监听input的变化实时改变该值，从而通过Proxy实现的单向更新对用到该变量的所有dom节点都进行更新。测试样例如下： 1234567891011121314let tem - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, MVVM, vue, react, 双向绑定, v-model"><meta property="og:image" content="http://example.com/assets/images/MVVM-step6-1.gif"><meta property="article:published_time" content="2022-10-13T03:21:08.000Z"><meta property="article:modified_time" content="2022-10-13T08:01:38.769Z"><meta property="og:updated_time" content="2022-10-13T08:01:38.769Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, MVVM, vue, react, 双向绑定, v-model"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/"
+    },
+    "headline": "手写MVVM框架-step6-实现v-model双向绑定 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-13T03:21:08.000Z",
+    "dateModified": "2022-10-13T08:01:38.769Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, MVVM, vue, react, 双向绑定, v-model",
+    "description": "问题定义上一步通过Proxy监听数据的变化，从而对dom节点进行更新，相当于是单向数据驱动的更新。现在想通过v-model标签，实现vue双向绑定的更新机制。 具体来说，通过添加input标签的v-model属性标识绑定的值，监听input的变化实时改变该值，从而通过Proxy实现的单向更新对用到该变量的所有dom节点都进行更新。测试样例如下： 1234567891011121314let tem - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step6-实现v-model双向绑定" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step6-实现v-model双向绑定&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step6-实现v-model双向绑定" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADrUlEQVR42u3aS27jQAxFUe9/051RA/mU+C7LskQb15NOx46kY6B+j3z8+8DXQ5QoUaJEfRzqUby+v///599/9/v33/9Pr7u6Jr3Wj2cSJWoIajnoDi62eojOA6+uu7r36vPVc4oSNQ1VXeTPgFz83P18moSO3i+fU5SoN0BVD3s0gLcGeZgcRIn6FNTRwK9uTDaz9IsUJepdUWkQk4ungyPZqFab59N26aJEvRhFB/Xd/56aJokS9SJUDN3DhY4WZDJRkEX3JVUPUaJeiDoKOarwJIWfdLGlwSYJZkSJmoTqhPWnDWpwaKwKcsvPiBI1BEULx7QIl0L+6vppMS8PmKJEDULRIDOFmynYTAs9hbcSWlGiLkR1LtAp1JHCAC3W4clHlKgBKFJsrgZpKnyTBZssuOh+okQNQFWLKQkyj9DPLOoksFn+vShRA1BkEHY3tJ3gP72XMO1duihRF6NSI1U10MmiST5PJqFYnRcl6iZUZ+NKJwAastAvKR1oRYmahEo3PyPET5ve9EWRg6goUVNQaeGl4WQqNpNmrJ3iQzz5ihJ1MYqG8OnnClIVF3abuXAhW5Soi1F0M5kGcjsk6YSU8AsQJWoCKjVUpYc6gj0ar861ccOVKFE3oVLQgTeTzQas6ssgxQnU8SJK1M2orYYMeNNOkaDTICJK1DRUCu9JoxXdlJJDJmnQap18RYm6GEU3kGQA715jpwkLdZGJEnUTKg1OEiimw2F1IKXF67TBFiVqAoo0OXUaqcjNyYa5s3kWJWoaijZqpAWYBDM0OKVNIaJETUNVizD9fdrY7oBpU4ooURNRtNicCmWkAZjCcfFalKjBqE7IshOukEW904AiStRUFAnwSfPvmQU1MuGUXWSiRN2I6mwaySKdAp00+XQXalGipqGqUL5bYEsTxO57qFguStQAVAoWaeBYfRG0iEC+sGpiESVqCqoT/KcmXjKwu02Q5OApStQUFAlCSCBCQs9OkS0FmMvnEyVqEKpzExKkPAOjBYs4UYgSdQNqp0DdOeyRAhyZFFqNwaJE3YiKoTvYXNLmxk6DJL0O6ngRJepC1G4xOg32NNFUizk5kOLFV5SoG1CksbB7oCNNkGQSSOFpWSAQJepGVBU4pkUyBfudIJNuaMtCtihRg1HdRZI2dVQFcLqBjYuvKFFvgKoeJEFpoY8WB1rVeVGiLkaRBqwOghYIaNNWWrhFiZqEosHLM81TO0UHErI+nSaJEnUy6pNeokSJEiXqY15fDMayrxIns6MAAAAASUVORK5CYII=" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step6-实现v-model双向绑定</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-13</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step6-实现v-model双向绑定&url=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step6-实现v-model双向绑定&url=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/13/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step6-%E5%AE%9E%E7%8E%B0v-model%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADrUlEQVR42u3aS27jQAxFUe9/051RA/mU+C7LskQb15NOx46kY6B+j3z8+8DXQ5QoUaJEfRzqUby+v///599/9/v33/9Pr7u6Jr3Wj2cSJWoIajnoDi62eojOA6+uu7r36vPVc4oSNQ1VXeTPgFz83P18moSO3i+fU5SoN0BVD3s0gLcGeZgcRIn6FNTRwK9uTDaz9IsUJepdUWkQk4ungyPZqFab59N26aJEvRhFB/Xd/56aJokS9SJUDN3DhY4WZDJRkEX3JVUPUaJeiDoKOarwJIWfdLGlwSYJZkSJmoTqhPWnDWpwaKwKcsvPiBI1BEULx7QIl0L+6vppMS8PmKJEDULRIDOFmynYTAs9hbcSWlGiLkR1LtAp1JHCAC3W4clHlKgBKFJsrgZpKnyTBZssuOh+okQNQFWLKQkyj9DPLOoksFn+vShRA1BkEHY3tJ3gP72XMO1duihRF6NSI1U10MmiST5PJqFYnRcl6iZUZ+NKJwAastAvKR1oRYmahEo3PyPET5ve9EWRg6goUVNQaeGl4WQqNpNmrJ3iQzz5ihJ1MYqG8OnnClIVF3abuXAhW5Soi1F0M5kGcjsk6YSU8AsQJWoCKjVUpYc6gj0ar861ccOVKFE3oVLQgTeTzQas6ssgxQnU8SJK1M2orYYMeNNOkaDTICJK1DRUCu9JoxXdlJJDJmnQap18RYm6GEU3kGQA715jpwkLdZGJEnUTKg1OEiimw2F1IKXF67TBFiVqAoo0OXUaqcjNyYa5s3kWJWoaijZqpAWYBDM0OKVNIaJETUNVizD9fdrY7oBpU4ooURNRtNicCmWkAZjCcfFalKjBqE7IshOukEW904AiStRUFAnwSfPvmQU1MuGUXWSiRN2I6mwaySKdAp00+XQXalGipqGqUL5bYEsTxO57qFguStQAVAoWaeBYfRG0iEC+sGpiESVqCqoT/KcmXjKwu02Q5OApStQUFAlCSCBCQs9OkS0FmMvnEyVqEKpzExKkPAOjBYs4UYgSdQNqp0DdOeyRAhyZFFqNwaJE3YiKoTvYXNLmxk6DJL0O6ngRJepC1G4xOg32NNFUizk5kOLFV5SoG1CksbB7oCNNkGQSSOFpWSAQJepGVBU4pkUyBfudIJNuaMtCtihRg1HdRZI2dVQFcLqBjYuvKFFvgKoeJEFpoY8WB1rVeVGiLkaRBqwOghYIaNNWWrhFiZqEosHLM81TO0UHErI+nSaJEnUy6pNeokSJEiXqY15fDMayrxIns6MAAAAASUVORK5CYII=" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题定义</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E8%AF%86%E5%88%ABinput%E5%92%8Cv-model"><span class="post-toc-number">2.</span> <span class="post-toc-text">识别input和v-model</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%9B%91%E5%90%ACinput%E5%8F%98%E5%8C%96"><span class="post-toc-number">3.</span> <span class="post-toc-text">监听input变化</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">4.</span> <span class="post-toc-text">测试</span></a></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><p>上一步通过Proxy监听数据的变化，从而对dom节点进行更新，相当于是单向数据驱动的更新。现在想通过v-model标签，实现vue双向绑定的更新机制。</p>
+<p>具体来说，通过添加input标签的v-model属性标识绑定的值，监听input的变化实时改变该值，从而通过Proxy实现的单向更新对用到该变量的所有dom节点都进行更新。测试样例如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">&lt;div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        name is &#123;&#123; name &#125;&#125;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;input  v-model=&#x27;name&#x27;&gt;&lt;/input&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;   </span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> root = <span class="title function_">createComponent</span>(template, &#123; <span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span> &#125;);</span><br><span class="line"><span class="title function_">render</span>(root, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>具体步骤可细化成三个部分：</p>
+<ol>
+<li>识别input标签。</li>
+<li>识别v-model属性。</li>
+<li>监听input变化，更新v-model绑定的变量。</li>
+</ol>
+<h1 id="识别input和v-model"><a href="#识别input和v-model" class="headerlink" title="识别input和v-model"></a>识别input和v-model</h1><p>input的识别即在token关键词中添加相应标签即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> token = <span class="keyword">new</span> <span class="title class_">Set</span>([<span class="string">&#x27;div&#x27;</span>, <span class="string">&#x27;ul&#x27;</span>, <span class="string">&#x27;li&#x27;</span>, <span class="string">&#x27;p&#x27;</span>, <span class="string">&#x27;input&#x27;</span>]);</span><br></pre></td></tr></table></figure>
+
+<p>对于v-model的识别，由于<code>-</code>不能用作js变量名，所以之前在step2中基于添加this识别属性名的方法有些不妥，需要把<code>-</code>转换成<code>_</code>，所以这里换用正则匹配的方式对属性内容进行解析。具体来讲首先在update中对input和v-model进行特殊处理，将v-model后绑定的变量转化成具体的值写入value变量中：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Element</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="title function_">update</span>(<span class="params">vdom = <span class="variable language_">this</span></span>) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&#x27;jsxStr&#x27;</span> <span class="keyword">in</span> vdom.<span class="property">props</span>) &#123;</span><br><span class="line">            <span class="comment">// ...</span></span><br><span class="line">            <span class="keyword">if</span> (vdom.<span class="property">type</span> == <span class="string">&#x27;input&#x27;</span> &amp;&amp; <span class="string">&#x27;v-model&#x27;</span> <span class="keyword">in</span> props) &#123;</span><br><span class="line">                <span class="comment">// 获得v-model后绑定的变量</span></span><br><span class="line">                <span class="keyword">let</span> varName = <span class="title function_">getProps</span>(vdom.<span class="property">props</span>.<span class="property">jsxStr</span>)[<span class="string">&#x27;v-model&#x27;</span>].<span class="title function_">trim</span>();</span><br><span class="line">                <span class="comment">// 写入到input虚拟dom的value值中</span></span><br><span class="line">                props.<span class="property">value</span> = <span class="title function_">resolveJsx</span>(<span class="string">`&#123;&#123;<span class="subst">$&#123;varName&#125;</span>&#125;&#125;`</span>, <span class="variable language_">this</span>.<span class="property">props</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 更新替换props</span></span><br><span class="line">            vdom.<span class="property">props</span> = props;</span><br><span class="line">            <span class="comment">// ...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProps</span>(<span class="params">propsStr</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!propsStr) <span class="keyword">return</span> &#123;&#125;;</span><br><span class="line">    <span class="keyword">if</span> (!propsStr.<span class="title function_">trim</span>()) <span class="keyword">return</span> &#123;&#125;;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">getPropsByReg</span>(propsStr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getPropsByReg</span>(<span class="params">propsStr</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> res = []; <span class="comment">// 解析结果</span></span><br><span class="line">    <span class="keyword">let</span> regs = [</span><br><span class="line">        <span class="regexp">/[ ]+[a-zA-Z][a-zA-Z0-9-]*= *&#x27;[^&#x27;]+&#x27;/g</span>,</span><br><span class="line">        <span class="regexp">/[ ]+[a-zA-Z][a-zA-Z0-9-]*= *&quot;[^&quot;]+&quot;/g</span></span><br><span class="line">    ];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> reg <span class="keyword">of</span> regs) &#123;</span><br><span class="line">        <span class="keyword">let</span> matched = propsStr.<span class="title function_">match</span>(reg);</span><br><span class="line">        <span class="keyword">if</span> (matched) &#123;</span><br><span class="line">            res = [...res, ...matched.<span class="title function_">map</span>(<span class="function"><span class="params">v</span> =&gt;</span> v.<span class="title function_">trim</span>())];</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> props = &#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> kv <span class="keyword">of</span> res) &#123; <span class="comment">// 遍历结果</span></span><br><span class="line">        <span class="keyword">let</span> [key, value] = kv.<span class="title function_">split</span>(<span class="string">&#x27;=&#x27;</span>).<span class="title function_">map</span>(<span class="function"><span class="params">v</span> =&gt;</span> v.<span class="title function_">trim</span>()); <span class="comment">// 去除左右空格</span></span><br><span class="line">        props[key] = value.<span class="title function_">slice</span>(<span class="number">1</span>, value.<span class="property">length</span> - <span class="number">1</span>); <span class="comment">// 去除value左右的引号（&#x27;和&quot;）</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> props;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="监听input变化"><a href="#监听input变化" class="headerlink" title="监听input变化"></a>监听input变化</h1><p>通过在render创建具体虚拟dom时对oninput事件进行重载，监听到变化调用组件的setState触发更新：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// component用作保留根节点虚拟dom（即组件的引用）</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">render</span>(<span class="params">vdom, parentElement, component = vdom</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; type, props, children &#125; = vdom;</span><br><span class="line">    <span class="keyword">let</span> ele;</span><br><span class="line">    <span class="keyword">if</span> (type === <span class="string">&#x27;text&#x27;</span>) &#123;</span><br><span class="line">        ele = <span class="variable language_">document</span>.<span class="title function_">createTextNode</span>(props.<span class="property">value</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        ele = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(type);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (type == <span class="string">&#x27;input&#x27;</span> &amp;&amp; <span class="string">&#x27;v-model&#x27;</span> <span class="keyword">in</span> props) &#123;</span><br><span class="line">        <span class="comment">// 获得v-model后绑定的变量名</span></span><br><span class="line">        <span class="keyword">let</span> varName = <span class="title function_">getProps</span>(props.<span class="property">jsxStr</span>)[<span class="string">&#x27;v-model&#x27;</span>].<span class="title function_">trim</span>();</span><br><span class="line">        ele.<span class="property">oninput</span> = <span class="keyword">function</span>(<span class="params">e</span>) &#123;</span><br><span class="line">            component.<span class="title function_">setState</span>(&#123;</span><br><span class="line">                <span class="comment">// 将变量名修改成最新值</span></span><br><span class="line">                [varName]: e.<span class="property">target</span>.<span class="property">value</span></span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p><img src="/../assets/images/MVVM-step6-1.gif" alt="运行结果"></p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-13");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-13T03:21:08.000Z" itemprop="datePublished">2022-10-13</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+<a class="post-tags-list-item" href="/tags/%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A/" rel="tag">#&nbsp;双向绑定</a>
+
+<a class="post-tags-list-item" href="/tags/v-model/" rel="tag">#&nbsp;v-model</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/15/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step7-diff%E7%AE%97%E6%B3%95/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step7-diff算法</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step5-组件更新优化</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

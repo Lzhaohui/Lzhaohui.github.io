@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step4-组件的抽象与更新 | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step4-组件的抽象与更新 | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/"><meta property="og:locale" content="zh-CN"><meta name="description" content="问题描述之前实现的方法可以通过trans函数将jsx文本解析成虚拟dom，并通过render函数将虚拟dom转换成真实dom显示到网页上。 下一步的要做的是如果jsx中的变量有更新，也可以将真实的dom节点进行更新。具体来讲，实现一个函数update，可以根据现有的jsx变量重新更新真实dom的对应值，而无需重新生成一边所有的真实dom： 12345678910111213141516171819 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, MVVM, vue, react, setState, 组件更新, 组件"><meta property="og:image" content="http://example.com/assets/images/MVVM-step4-1.jpg"><meta property="og:image" content="http://example.com/assets/images/MVVM-step4-2.jpg"><meta property="article:published_time" content="2022-10-11T10:03:52.000Z"><meta property="article:modified_time" content="2022-10-11T13:32:49.907Z"><meta property="og:updated_time" content="2022-10-11T13:32:49.907Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, MVVM, vue, react, setState, 组件更新, 组件"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/"
+    },
+    "headline": "手写MVVM框架-step4-组件的抽象与更新 | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-11T10:03:52.000Z",
+    "dateModified": "2022-10-11T13:32:49.907Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, MVVM, vue, react, setState, 组件更新, 组件",
+    "description": "问题描述之前实现的方法可以通过trans函数将jsx文本解析成虚拟dom，并通过render函数将虚拟dom转换成真实dom显示到网页上。 下一步的要做的是如果jsx中的变量有更新，也可以将真实的dom节点进行更新。具体来讲，实现一个函数update，可以根据现有的jsx变量重新更新真实dom的对应值，而无需重新生成一边所有的真实dom： 12345678910111213141516171819 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step4-组件的抽象与更新" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step4-组件的抽象与更新&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step4-组件的抽象与更新" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADqUlEQVR42u3bQXLjMAwFUd//0jP7RMBvSFYEu9obJxOb0lMVSRDAvP594eslSpQoUaK+DvVqXtXffw32499+fvfo82fH6u5HlKgtqMNJdzBYddFfgx/8fvTeYdN1j+5flKhNqG6Qo4Wj+rlaaKobq65Xfbe9T1GiPgBVTdC0IFBUtUgkqChRn4qqbr7bjFMg3F0zBbqiRH0Kqg0Uw+RN308PKS1Ab4/SRYm6GUUOZxve35pNEiXqJlRMug8PftUGOnlwt1c9RIm6EZWSKGQjniZiUpBabdipACFK1BYUHWya8CcLEE3+VAfNtpAtStRDKLoYkE2ze0hHn0ub9agAKErUQhS5IdIEQh5Guj5NiIoStQlVHe5SMpF+nhwGzy4YokRtRJGNsyq6kcaqmIAcFCLixi9K1AJUt7FOGqqmyUqS8CSLS5mhFSXqYVQMFkHRetIQPFloyHdEidqCopsfaVhMSf1Jk+O0WUuUqC2oSSBJEigUQAoGJDAQJWobihahrybxabPvmYSnKFHbUKSJt9sMaRMHTeLQIt6l6rwoUTejSPPU5MA4SkK+Zv8BDRWyRYl6EJUCRxK8kiRJTEYONvm4UIgS9RDqyoFw2hg8DWDJOKJEbUOljfVUUhE2G5MiG11MRInagiKD02QkDZDTJp8C4TLQFiVqAaqb8HFiDgLZyUOaJlBFidqEmgaipPmJNmGhJiowlihR21BpcySBKdmEyY1NkqBtF5koUQ+hSGEsJUS6glhKQl4NokWJ2ogiAeSZ5AtZaNKDJElTUaK2oWjyMiUdSSNJWkxIMyRe/USJegA1afi4enjsCubTRUmUqK0oMplJkJoK1TSA7QLXuHCIErUI1d0o3UwJNib5i4eDEkGiRC1AkQ2QNFTRAt0kgE0L1qUmRlGibkKRZDx5p4l+ErjGBEsquokS9SCKLg5nCs+0cEaTnTGBKkrUAhROvr9xYtNGyPSQUCFblKg/Rk0bqCaJftr4mDZr2sgiStQmVErmp8k+3bDphj5JtIoStQGVQCS5QhOhk0mfgu1RgUCUqD9EpRe5UVQQGxbi6DhtgUCUqAdQaRJ2F6QHvi74JYsSHkeUqCUomgShxesu4J0Gu6RhS5SojSh6CJw0kUwWnuqG01iiRH0aihYGUiCMg9JBYyQquokStRA1Ocx1gSot9JFDJC5kixL1EOrqRO8mdVpQyEZNGhpFidqCIkFj2mCnkzolTyeFA1GiNqG+6SVKlChRor7m9R+4RdOAdgUGkQAAAABJRU5ErkJggg==" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step4-组件的抽象与更新</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-11</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step4-组件的抽象与更新&url=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step4-组件的抽象与更新&url=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/11/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step4-%E7%BB%84%E4%BB%B6%E7%9A%84%E6%8A%BD%E8%B1%A1%E4%B8%8E%E6%9B%B4%E6%96%B0/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAAAAADBtVLEAAADqUlEQVR42u3bQXLjMAwFUd//0jP7RMBvSFYEu9obJxOb0lMVSRDAvP594eslSpQoUaK+DvVqXtXffw32499+fvfo82fH6u5HlKgtqMNJdzBYddFfgx/8fvTeYdN1j+5flKhNqG6Qo4Wj+rlaaKobq65Xfbe9T1GiPgBVTdC0IFBUtUgkqChRn4qqbr7bjFMg3F0zBbqiRH0Kqg0Uw+RN308PKS1Ab4/SRYm6GUUOZxve35pNEiXqJlRMug8PftUGOnlwt1c9RIm6EZWSKGQjniZiUpBabdipACFK1BYUHWya8CcLEE3+VAfNtpAtStRDKLoYkE2ze0hHn0ub9agAKErUQhS5IdIEQh5Guj5NiIoStQlVHe5SMpF+nhwGzy4YokRtRJGNsyq6kcaqmIAcFCLixi9K1AJUt7FOGqqmyUqS8CSLS5mhFSXqYVQMFkHRetIQPFloyHdEidqCopsfaVhMSf1Jk+O0WUuUqC2oSSBJEigUQAoGJDAQJWobihahrybxabPvmYSnKFHbUKSJt9sMaRMHTeLQIt6l6rwoUTejSPPU5MA4SkK+Zv8BDRWyRYl6EJUCRxK8kiRJTEYONvm4UIgS9RDqyoFw2hg8DWDJOKJEbUOljfVUUhE2G5MiG11MRInagiKD02QkDZDTJp8C4TLQFiVqAaqb8HFiDgLZyUOaJlBFidqEmgaipPmJNmGhJiowlihR21BpcySBKdmEyY1NkqBtF5koUQ+hSGEsJUS6glhKQl4NokWJ2ogiAeSZ5AtZaNKDJElTUaK2oWjyMiUdSSNJWkxIMyRe/USJegA1afi4enjsCubTRUmUqK0oMplJkJoK1TSA7QLXuHCIErUI1d0o3UwJNib5i4eDEkGiRC1AkQ2QNFTRAt0kgE0L1qUmRlGibkKRZDx5p4l+ErjGBEsquokS9SCKLg5nCs+0cEaTnTGBKkrUAhROvr9xYtNGyPSQUCFblKg/Rk0bqCaJftr4mDZr2sgiStQmVErmp8k+3bDphj5JtIoStQGVQCS5QhOhk0mfgu1RgUCUqD9EpRe5UVQQGxbi6DhtgUCUqAdQaRJ2F6QHvi74JYsSHkeUqCUomgShxesu4J0Gu6RhS5SojSh6CJw0kUwWnuqG01iiRH0aihYGUiCMg9JBYyQquokStRA1Ocx1gSot9JFDJC5kixL1EOrqRO8mdVpQyEZNGhpFidqCIkFj2mCnkzolTyeFA1GiNqG+6SVKlChRor7m9R+4RdOAdgUGkQAAAABJRU5ErkJggg==" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题描述</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%BB%84%E4%BB%B6%E6%8A%BD%E8%B1%A1"><span class="post-toc-number">2.</span> <span class="post-toc-text">组件抽象</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0"><span class="post-toc-number">3.</span> <span class="post-toc-text">组件更新</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-number">4.</span> <span class="post-toc-text">测试</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98"><span class="post-toc-number">5.</span> <span class="post-toc-text">一些问题</span></a></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>之前实现的方法可以通过trans函数将jsx文本解析成虚拟dom，并通过render函数将虚拟dom转换成真实dom显示到网页上。</p>
+<p>下一步的要做的是如果jsx中的变量有更新，也可以将真实的dom节点进行更新。具体来讲，实现一个函数update，可以根据现有的jsx变量重新更新真实dom的对应值，而无需重新生成一边所有的真实dom：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> template = <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div style=&quot;background-color: &#123;&#123; color &#125;&#125;&quot; class = &quot;test&quot;&gt;</span></span><br><span class="line"><span class="string">        Hello World!</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            表格</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;div&gt;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;姓 名：&#123;&#123; name ? name : &#x27;none&#x27; &#125;&#125;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;年 龄：&#123;&#123; age ? age : &#x27;none&#x27; &#125;&#125;&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="keyword">let</span> props = &#123; <span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span>, <span class="attr">age</span>: <span class="literal">null</span>, <span class="attr">color</span>: <span class="string">&#x27;red&#x27;</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> root = <span class="title function_">trans</span>(template, props);</span><br><span class="line"><span class="title function_">render</span>(root, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    root.<span class="property">props</span>.<span class="property">age</span> = <span class="number">25</span>;</span><br><span class="line">    root.<span class="property">props</span>.<span class="property">color</span> = <span class="string">&#x27;blue&#x27;</span>;</span><br><span class="line">    root.<span class="title function_">update</span>();</span><br><span class="line">&#125;, <span class="number">2000</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Hello World!（红色背景）</span></span><br><span class="line"><span class="comment">// 表格</span></span><br><span class="line"><span class="comment">// 姓 名：lzh</span></span><br><span class="line"><span class="comment">// 年 龄：none</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2000ms后变成 ==&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Hello World!（蓝色背景）</span></span><br><span class="line"><span class="comment">// 表格</span></span><br><span class="line"><span class="comment">// 姓 名：lzh</span></span><br><span class="line"><span class="comment">// 年 龄：25</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="组件抽象"><a href="#组件抽象" class="headerlink" title="组件抽象"></a>组件抽象</h1><p>之前的虚拟dom节点定义如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Element</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">type, props, children</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">type</span> = type === <span class="literal">undefined</span> ? <span class="string">&#x27;&#x27;</span> : type;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">props</span> = props === <span class="literal">undefined</span> ? &#123;&#125; : props;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">children</span> = children === <span class="literal">undefined</span> ? [] : children;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">parent</span> = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">createElement</span>(<span class="params">type, props, children</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Element</span>(type, props, children);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在虚拟dom的构建过程中，我们写了一个CreateElementHandle函数帮助构建。其中为所有虚拟dom创建了一个根虚拟节点root，其类型为<code>div</code>，props为空，children为真正构建出的虚拟dom的根节点，之所以如此构建（而不是最顶层是虚拟dom的数组），最主要考虑的就是有一些属性是该jsx文本对应的所用虚拟dom节点共用的，比如与jsx相关的jsxProps对象，不应添加到所有的虚拟dom节点上，而是应该抽象到最顶层进行共用，所以创建一个根虚拟dom节点进行承载。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CreateElementHandle</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">lastLevel</span> = <span class="number">0</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">lastDom</span> = <span class="literal">null</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">doms</span> = []; <span class="comment">// 虚拟dom</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">root</span> = <span class="title function_">createElement</span>(<span class="string">&#x27;div&#x27;</span>, &#123;&#125;, <span class="variable language_">this</span>.<span class="property">doms</span>); <span class="comment">// 为所有虚拟dom创建一个根节点</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title function_">addElements</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">//... </span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">getElements</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">root</span>; <span class="comment">// 返回外层根节点</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不过其实所谓的根虚拟dom节点，也就是抽象意义上的组件。一个组件由许多的虚拟dom节点组成，该组件上的一些属性可以被其所有的子虚拟dom节点共用，同时组件对象本身也是一个虚拟dom节点。因此可以抽象出一个组件类来承载这一逻辑关系：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Element</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">children, componentProps</span>) &#123;</span><br><span class="line">        <span class="variable language_">super</span>(<span class="string">&#x27;div&#x27;</span>, &#123;&#125;, children);</span><br><span class="line">         <span class="comment">// 组件的componentProps其实不同于其他虚拟dom的属性</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">props</span> = componmentProps; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CreateElementHandle函数的功能也就变成了帮助创建组件，可以将其修改为CreateComponentHandle：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CreateElementHandle</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">jsxProps</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">lastLevel</span> = <span class="number">0</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">lastDom</span> = <span class="literal">null</span>;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">doms</span> = [];</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">root</span> = <span class="keyword">new</span> <span class="title class_">Component</span>(<span class="variable language_">this</span>.<span class="property">doms</span>, jsxProps);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以trans的功能实际上就是根据jsx文本和对应的props属性，创建一个组件，故可将其更名为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createComponent</span>(<span class="params">template, jsxProps = &#123;&#125;</span>);</span><br></pre></td></tr></table></figure>
+
+<h1 id="组件更新"><a href="#组件更新" class="headerlink" title="组件更新"></a>组件更新</h1><p>所以接下要实现的目标就是，对于一个组件对象root，如果其componentProps进行了更新，那么就对应更新虚拟dom的值，并将其更新到真实dom上。即在Component中实现一个update函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">update</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">// 如果是文本节点&lt;text&gt;</span></span><br><span class="line">            <span class="comment">// 根据jsx和componentProps重新生成value</span></span><br><span class="line">            <span class="comment">// 将value更新到虚拟dom和对应的真实dom上</span></span><br><span class="line">        <span class="comment">// 如果是普通节点</span></span><br><span class="line">            <span class="comment">// 根据jsx和componentProps重新生成标签属性</span></span><br><span class="line">            <span class="comment">// 将属性更新到对应虚拟dom上和真实dom上</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以关键步骤就是，需要保留每个虚拟dom所对应的jsx文本，从而实现根据componentProps的变换重新生成对应的props。因此在jsx文本解析的时候需要对原始jsx进行保留处理，可在createComponent函数修改如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createComponent</span>(<span class="params">template, jsxProps = &#123;&#125;</span>) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">let</span> vEleHandle = <span class="keyword">new</span> <span class="title class_">CreateComponentHandle</span>(jsxProps);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">while</span> () &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="keyword">if</span> () &#123; <span class="comment">// 处理值</span></span><br><span class="line">            <span class="keyword">let</span> jsxStr = template.<span class="title function_">slice</span>(valueIdx, idx).<span class="title function_">trim</span>();</span><br><span class="line">            <span class="keyword">let</span> value = <span class="title function_">resolveJsx</span>(jsxStr, jsxProps);</span><br><span class="line">            <span class="comment">// 保留jsxStr</span></span><br><span class="line">            value &amp;&amp; vEleHandle.<span class="title function_">addElements</span>(<span class="string">&#x27;text&#x27;</span>, &#123; jsxStr, value &#125;, [], stack.<span class="property">length</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// 处理标签</span></span><br><span class="line">                <span class="keyword">let</span> &#123; type, jsxStr &#125; = <span class="title function_">resolveTagContent</span>(tagContent);</span><br><span class="line">                <span class="keyword">let</span> propsStr = <span class="title function_">resolveJsx</span>(jsxStr, jsxProps);</span><br><span class="line">                <span class="keyword">let</span> props = <span class="title function_">getProps</span>(propsStr);</span><br><span class="line">                <span class="comment">// 保留jsxStr</span></span><br><span class="line">                vEleHandle.<span class="title function_">addElements</span>(type, &#123;...props, jsxStr &#125;, [], stack.<span class="property">length</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> vEleHandle.<span class="title function_">getComponent</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时在对真实dom更新的setProps函数中，对jsxStr进行过滤：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">setProps</span>(<span class="params">element, props</span>) &#123;</span><br><span class="line">    <span class="title class_">Object</span>.<span class="title function_">entries</span>(props).<span class="title function_">forEach</span>(<span class="function">(<span class="params">[key, value]</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (key == <span class="string">&#x27;jsxStr&#x27;</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="title function_">setProp</span>(element, key, value);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后即可将update函数实现如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Element</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    <span class="title function_">update</span>(<span class="params">vdom = <span class="variable language_">this</span></span>) &#123; <span class="comment">// 默认从顶层虚拟dom更新</span></span><br><span class="line">        <span class="keyword">if</span> (vdom.<span class="property">type</span> == <span class="string">&#x27;text&#x27;</span> &amp;&amp; vdom.<span class="property">props</span>.<span class="property">jsxStr</span>) &#123;</span><br><span class="line">            <span class="keyword">let</span> value = <span class="title function_">resolveJsx</span>(vdom.<span class="property">props</span>.<span class="property">jsxStr</span>, <span class="variable language_">this</span>.<span class="property">componentProps</span>);</span><br><span class="line">            <span class="keyword">if</span> (vdom.<span class="property">props</span>.<span class="property">value</span> != value) &#123;</span><br><span class="line">                vdom.<span class="property">props</span>.<span class="property">value</span> = value;</span><br><span class="line">                vdom[targetDom].<span class="property">textContent</span> = value;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (vdom.<span class="property">props</span>.<span class="property">jsxStr</span>) &#123;</span><br><span class="line">                <span class="comment">// 生成运行后的jsx文本</span></span><br><span class="line">                <span class="keyword">let</span> propsStr = <span class="title function_">resolveJsx</span>(vdom.<span class="property">props</span>.<span class="property">jsxStr</span>, <span class="variable language_">this</span>.<span class="property">componentProps</span>);</span><br><span class="line">                <span class="comment">// 解析生成props</span></span><br><span class="line">                <span class="keyword">let</span> props = <span class="title function_">getProps</span>(propsStr);</span><br><span class="line">                <span class="comment">// 拷贝原始jsx文本</span></span><br><span class="line">                props.<span class="property">jsxStr</span> = vdom.<span class="property">props</span>.<span class="property">jsxStr</span>;</span><br><span class="line">                <span class="comment">// 更新替换props</span></span><br><span class="line">                vdom.<span class="property">props</span> = props;</span><br><span class="line">                <span class="comment">// 删除原来的属性</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">let</span> attr <span class="keyword">of</span> vdom[targetDom].<span class="property">attributes</span>) &#123;</span><br><span class="line">                    vdom[targetDom].<span class="title function_">removeAttributeNode</span>(attr);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 更新属性</span></span><br><span class="line">                <span class="title function_">setProps</span>(vdom[targetDom], props);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 更新子虚拟dom</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> child <span class="keyword">of</span> vdom.<span class="property">children</span>) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.<span class="title function_">update</span>(child);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> props = &#123; <span class="attr">name</span>: <span class="string">&#x27;lzh&#x27;</span>, <span class="attr">age</span>: <span class="literal">null</span>, <span class="attr">color</span>: <span class="string">&#x27;red&#x27;</span> &#125;;</span><br><span class="line"><span class="keyword">let</span> root = <span class="title function_">createComponent</span>(template, props);</span><br><span class="line"></span><br><span class="line"><span class="title function_">render</span>(root, <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>));</span><br><span class="line"></span><br><span class="line">root.<span class="title function_">setState</span>(&#123;</span><br><span class="line">    <span class="attr">age</span>: <span class="number">25</span>,</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;blue&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    root.<span class="property">props</span>.<span class="property">age</span> = <span class="number">25</span>;</span><br><span class="line">    root.<span class="property">props</span>.<span class="property">color</span> = <span class="string">&#x27;blue&#x27;</span>;</span><br><span class="line">    root.<span class="title function_">update</span>();</span><br><span class="line">&#125;, <span class="number">2000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到2000ms后html的内容进行了变化：<br><img src="/../assets/images/MVVM-step4-1.jpg" alt="运行结果"><br><img src="/../assets/images/MVVM-step4-2.jpg" alt="运行结果"></p>
+<p>同时还可以据此，在组件中封装一个setState函数进行异步更新：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Component</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    <span class="title function_">setState</span>(<span class="params">props</span>) &#123;</span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="variable language_">this</span>.<span class="property">props</span>, props);</span><br><span class="line">            <span class="variable language_">this</span>.<span class="title function_">update</span>();</span><br><span class="line">        &#125;, <span class="number">2000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>则可以如下调用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root.<span class="title function_">setState</span>(&#123;</span><br><span class="line">    <span class="attr">age</span>: <span class="number">25</span>,</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;blue&#x27;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h1><ol>
+<li>目前只能从组件的根节点深度遍历更新，而且对于不需要更新的节点重新解析了jsx。</li>
+<li>对于连续的更新仍旧会依次运行完，即使最后一次更新才是最终需要渲染的结果。</li>
+</ol>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-11");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-11T10:03:52.000Z" itemprop="datePublished">2022-10-11</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+<a class="post-tags-list-item" href="/tags/setState/" rel="tag">#&nbsp;setState</a>
+
+<a class="post-tags-list-item" href="/tags/%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0/" rel="tag">#&nbsp;组件更新</a>
+
+<a class="post-tags-list-item" href="/tags/%E7%BB%84%E4%BB%B6/" rel="tag">#&nbsp;组件</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/12/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step5-%E7%BB%84%E4%BB%B6%E6%9B%B4%E6%96%B0%E4%BC%98%E5%8C%96/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step5-组件更新优化</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step3-jsx子集解析</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>

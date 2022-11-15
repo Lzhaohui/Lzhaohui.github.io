@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        hexo-theme-suka © SukkaW
+        GitHub: https://github.com/SukkaW/hexo-theme-suka
+    -->
+
+    <!-- ### Resource Hint ### -->
+
+    <!-- ## DNS Prefetch ## -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+<!-- busuanzi -->
+
+    <link rel="dns-prefetch" href="//busuanzi.ibruce.info">
+
+
+<!-- comment -->
+
+
+
+
+
+
+
+<!-- analytics -->
+
+
+
+
+
+
+
+    <!-- ## Preload ## -->
+    
+    <!-- Busuanzi -->
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" as="script">
+
+
+
+
+
+
+
+    <!-- ### Meta & Title & Info ### -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <meta name="renderer" content="webkit">
+
+    <!-- Title -->
+    <title>手写MVVM框架-step2-props解析和render | 李朝晖的blog</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image&#x2F;ico" href="/img/suka-favicon.ico">
+
+    <!-- ### Import File ### -->
+    <link rel="stylesheet" href="/lib/spectre/spectre.min.css"><style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    a, a:visited {
+        color: #0070ff;
+    }
+
+    a:active, a:focus, a:hover {
+        color: #0070ff;
+        opacity: .75;
+    }
+
+    #post-content a,
+    #post-content a:hover,
+    #post-content a:focus,
+    #post-content a:visited {
+        color: #005eb9;
+        opacity: 1;
+    }
+
+    
+
+    .post-entry .card-body a {
+        color: #0070ff;
+    }
+
+    .avatar {
+        background: #444;
+    }
+
+    .navbar-link,
+    .navbar-link:visited,
+    .timeline .timeline-item .timeline-icon.icon-lg {
+        color: #0070ff;
+    }
+
+    .navbar-link:hover {
+        color: #0070ff;
+        opacity: .8;
+    }
+
+    #search-input .btn,
+    #disqus_click_btn,
+    #disqus-switch-to-direct,
+    #disqus-loadmore-button {
+        background: #727e96;
+        border-color: #727e96;
+        color: #fff;
+    }
+
+    #post-toc a.post-toc-link,
+    #post-toc a.post-toc-link:visited,
+    .share-menu.menu .menu-item>a {
+        color: #727e96;
+    }
+
+    .share-menu.menu .menu-item>a:hover,
+    .share-menu.menu .menu-item>a:focus,
+    .share-menu.menu .menu-item>a:visited {
+        color: #50596c;
+        background: #f8f9fa;
+        opacity: .85;
+    }
+</style><link rel="stylesheet" href="/css/style.min.css">
+
+
+
+
+
+
+
+
+    <!-- Prettify Theme -->
+    
+    <link rel="preload" href="/css/highlight/github.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/highlight/github.min.css"></noscript>
+
+
+
+
+
+<script>
+/*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+</script>
+
+    <!-- ### Site Verification ### -->
+    
+
+
+    <meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="李朝晖的blog"><meta name="msapplication-starturl" content="http://example.com"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="李朝晖的blog"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ### The Open Graph & Twitter Card Protocol ### -->
+    <meta property="og:title" content="手写MVVM框架-step2-props解析和render | 李朝晖的blog"><meta property="og:site_name" content="李朝晖的blog"><meta property="og:type" content="article"><meta property="og:url" content="http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/"><meta property="og:locale" content="zh-CN"><meta name="description" content="问题定义在转化成虚拟dom节点之后，下一步就是将虚拟dom节点转化为真实的dom节点展示在浏览器中，但是在这之前，还需要将HTML标签中的属性添加到虚拟dom节点的props中，故问题定义如下：  解析HTML标签的属性，到虚拟dom节点的props中。 实现一个函数render，将虚拟dom节点转换并挂载到真实dom节点上。  解析props问题细化之前已经可以通过对’&amp;lt;’和’&amp;gt;’符 - 李朝晖 - 李朝晖的blog"><meta name="keywords" content="JavaScript, 虚拟dom, MVVM, vue, react, render, 词法分析, 正则表达式"><meta property="article:published_time" content="2022-10-08T12:17:48.000Z"><meta property="article:modified_time" content="2022-10-09T03:45:39.158Z"><meta property="og:updated_time" content="2022-10-09T03:45:39.158Z"><meta property="article:author" content="李朝晖"><meta property="article:tag" content="JavaScript, 虚拟dom, MVVM, vue, react, render, 词法分析, 正则表达式"><meta name="twitter:card" content="summary">
+
+    
+
+    <!-- ### Canonical link ### -->
+    <link rel="canonical" href="http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/">
+
+    <meta name="generator" content="Hexo 6.0.0">
+
+    <!-- ### Analytics ### -->
+    
+
+
+
+
+
+
+
+    <!-- ### Structured Data ### -->
+    
+
+
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "url": "http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/",
+    "@type": "BlogPosting",
+    "logo": "http://example.com/img/suka-favicon.ico",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/"
+    },
+    "headline": "手写MVVM框架-step2-props解析和render | 李朝晖的blog",
+    
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://example.com/img/suka-favicon.ico"
+    },
+    
+    "datePublished": "2022-10-08T12:17:48.000Z",
+    "dateModified": "2022-10-09T03:45:39.158Z",
+    "author": {
+        "@type": "Person",
+        "name": "李朝晖",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/default_avatar.png"
+        },
+        "description": "Hi, nice to meet you."
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "李朝晖的blog",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://example.com/img/suka-favicon.ico"
+        }
+    },
+    
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://example.com/search?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    
+    "keywords": "JavaScript, 虚拟dom, MVVM, vue, react, render, 词法分析, 正则表达式",
+    "description": "问题定义在转化成虚拟dom节点之后，下一步就是将虚拟dom节点转化为真实的dom节点展示在浏览器中，但是在这之前，还需要将HTML标签中的属性添加到虚拟dom节点的props中，故问题定义如下：  解析HTML标签的属性，到虚拟dom节点的props中。 实现一个函数render，将虚拟dom节点转换并挂载到真实dom节点上。  解析props问题细化之前已经可以通过对’&amp;amp;lt;’和’&amp;amp;gt;’符 - 李朝晖 - 李朝晖的blog"
+}
+</script>
+
+
+
+    <!-- ### Custom Head ### -->
+    
+</head>
+
+    <body>
+            
+
+            <!-- ### Main content ### -->
+            <!-- ## Header ##-->
+<header>
+    <h1 class="header-title text-center"><a href="/">李朝晖的blog</a></h1>
+
+    <p class="text-center header-slogan">
+        
+            
+                Hi, nice to meet you.
+            
+        
+    </p>
+
+    <nav class="navbar-section text-center">
+    
+        <a href="/" class="navbar-link">首页</a>
+    
+    
+        <a href="/archives/" class="navbar-link">归档</a>
+    
+    
+        <a href="/search" class="navbar-link">搜索</a>
+    
+    
+    
+        <div class="dropdown dropdown-right">
+    <a class="navbar-link dropdown-toggle" tabindex="0">分享</a>
+    <ul class="menu share-menu">
+
+        <!-- Share Weibo -->
+        
+        <li class="menu-item">
+            <a href="http://service.weibo.com/share/share.php?appkey=&title=李朝晖的blog&url=http://example.com&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+        </li>
+        
+
+        <!-- Share Twitter -->
+        
+        <li class="menu-item">
+            <a href="https://twitter.com/intent/tweet?text=李朝晖的blog&url=http://example.com&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+        </li>
+        
+
+        <!-- Share Facebook -->
+        
+        <li class="menu-item">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+        </li>
+        
+
+        <!-- Share Google+ -->
+        
+        <li class="menu-item">
+            <a href="https://plus.google.com/share?url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+        </li>
+        
+
+        <!-- Share LinkedIn -->
+        
+        <li class="menu-item">
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com&title=手写MVVM框架-step2-props解析和render" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+        </li>
+        
+
+        <!-- Share QQ -->
+        
+        <li class="menu-item">
+            <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=手写MVVM框架-step2-props解析和render&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+        </li>
+        
+
+        <!-- Share Telegram -->
+        
+        <li class="menu-item">
+            <a href="https://t.me/share/url?url=http://example.com&text=手写MVVM框架-step2-props解析和render" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+        </li>
+        
+
+        <!-- QRCode -->
+        
+        <li class="menu-item">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMQAAADECAAAAADlzdG3AAADMElEQVR42u3azVLbQBBFYd7/pZMNiwSkvueO1eWQOtqAhY3nc1V7pn8+fv0H14cIESJEiFhHfAzXXy/4fPznz6/3vr3JxWu+vu/VfbouESK2ENMCru5f/dP0+/TBXD0m6xIhYhNxtagUdHeLnL4EEpiuS4SIdyLSNT0vBerVl4YIET8BcRWgU9CSDTFtniJEvBNBEpqEnA51U2Bf/e3RU6wIESUiBeO7fj5W7RAhokCQQxkJdJL8t4t8rCouQkTZn5gOYmRzSgfAu8Nj2uzSekSI2ESQICSBT8HogHfSZBEh4iEECfAU9ClA03NSYH97jggRC4ipST4VAkjBmCY6U/NlxIsQsYBomoOk8JualmnzJIMtIkRsI9oEqC0SnxaM7zY+ESI2ESdFLjrYRQC3RQDyHBEiFhBjs3tI2umBkDTv06Z5mziJELGIIAWzdvikCd4Ev7wvQsQSghz4UlCnZIYU4Or7IkQsIKYgbovCJCibYlkcCBMhYgnRHrzI5jYFcdPEGTdfESKWECdNEDJQ0m5ebWFChIgNBA1Cksy3CVEano8HRhEiFhCkedgczugg+6uvEyFiC9EUCl4N9KPEp5k8EyFiCZEGUU4PgGljpcMwIkRsIqbi2DS4lQ5pdKHtwfB2QEWEiAcRpPA7FY6bgXaaDKGNWISIBQQZSqTNEtrAnwYB6EYnQsQmYkpW0gAvGfZth3vJEJkIEVsI0gCZGubTZpa+AFKhLm6GIkQsIk6G0NsBlrTRxUCmp1gRIh5CpEMggafGZZMQ4YF3ESKWEG3hCxd+wQD7UaNfhIglBGkWksIxWVRKtuiQjAgRmwhSJKOD6U1gnjRecGYnQsQLCFIQpoUuGpQpMSLDACJEbCBSA7HZ4FKjpP1gjqZsRIh4EUGKAanIRQ9vzSAKarqIELGAIAOIpGnfNE7oUH380ESIWEKk5CgF3vRmZDMlBenLTVeEiEXE6YB7SmhoQkS+ZESI+FcQU1GYbGJNkYwOtYgQ8W5EkwhNBYU0pEiLFSJEbCOm5vz0htMiSKGhGQI4TopEiCgR5NA1FZZTQtU0IEkzVISITcRPvkSIECFCxNr1G3DtvQpGNs1PAAAAAElFTkSuQmCC" alr="QRCode">
+        </li>
+        
+
+    </ul>
+</div>
+    
+    
+</nav>
+</header>
+
+            
+    <!-- ## Post ## -->
+    <div class="post-container">
+    <div id="post-card" class="card">
+        
+        <div class="card-item-container">
+            <div class="card-inner-cell">
+                <!-- # Post Header Info # -->
+                <div class="card-header">
+                    
+    <h1 class="card-title h3 mb-2">手写MVVM框架-step2-props解析和render</h1>
+
+
+
+
+<div class="post-header-info">
+    <p class="post-header-info-left text-gray">
+        <img class="author-thumb lazyload" data-src="/img/default_avatar.png" src="/img/suka-lazyload.gif" alt="李朝晖's Avatar">
+        <span>2022-10-08</span>
+        
+        
+            <!-- Busuanzi Post Views -->
+<span id="busuanzi_container_page_pv" hidden>
+    <span class="suka-devide-dot"></span>
+    <span></span>
+    <span id="busuanzi_value_page_pv"></span>
+    <span>Views</span>
+</span>
+        
+        
+    </p>
+    <div class="post-header-info-right">
+        
+            <div class="dropdown dropdown-right">
+<a class="dropdown-toggle" tabindex="0">分享本文</a>
+<ul class="menu share-menu">
+    <!-- Share Weibo -->
+    
+    <li class="menu-item">
+        <a href="http://service.weibo.com/share/share.php?appkey=&title=手写MVVM框架-step2-props解析和render&url=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/&pic=http://example.com/img/suka-favicon.ico&searchPic=false&style=simple" target="_blank" rel="external noopener noreferrer nofollow">分享到微博</a>
+    </li>
+    
+
+    <!-- Share Twitter -->
+    
+    <li class="menu-item">
+        <a href="https://twitter.com/intent/tweet?text=手写MVVM框架-step2-props解析和render&url=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/&via=李朝晖" target="_blank" rel="external noopener noreferrer nofollow">分享到 Twitter</a>
+    </li>
+    
+
+    <!-- Share Facebook -->
+    
+    <li class="menu-item">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Facebook</a>
+    </li>
+    
+
+    <!-- Share Google+ -->
+    
+    <li class="menu-item">
+        <a href="https://plus.google.com/share?url=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/" target="_blank" rel="external noopener noreferrer nofollow">分享到 Google+</a>
+    </li>
+    
+
+    <!-- Share LinkedIn -->
+    
+    <li class="menu-item">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/&title=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 LinkedIn</a>
+    </li>
+    
+
+    <!-- Share QQ -->
+    
+    <li class="menu-item">
+        <a href="http://connect.qq.com/widget/shareqq/index.html?site=李朝晖的blog&title=李朝晖的blog&summary=&pics=http://example.com/img/suka-favicon.ico&url=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/" target="_blank" rel="external noopener noreferrer nofollow"> 分享到 QQ</a>
+    </li>
+    
+
+    <!-- Share Telegram -->
+    
+    <li class="menu-item">
+        <a href="https://t.me/share/url?url=http://example.com/2022/10/08/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step2-props%E8%A7%A3%E6%9E%90%E5%92%8Crender/&text=李朝晖的blog" target="_blank" rel="external noopener noreferrer nofollow">分享到 Telegram</a>
+    </li>
+    
+
+    <!-- QRCode -->
+    
+    <li class="menu-item">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMQAAADECAAAAADlzdG3AAADMElEQVR42u3azVLbQBBFYd7/pZMNiwSkvueO1eWQOtqAhY3nc1V7pn8+fv0H14cIESJEiFhHfAzXXy/4fPznz6/3vr3JxWu+vu/VfbouESK2ENMCru5f/dP0+/TBXD0m6xIhYhNxtagUdHeLnL4EEpiuS4SIdyLSNT0vBerVl4YIET8BcRWgU9CSDTFtniJEvBNBEpqEnA51U2Bf/e3RU6wIESUiBeO7fj5W7RAhokCQQxkJdJL8t4t8rCouQkTZn5gOYmRzSgfAu8Nj2uzSekSI2ESQICSBT8HogHfSZBEh4iEECfAU9ClA03NSYH97jggRC4ipST4VAkjBmCY6U/NlxIsQsYBomoOk8JualmnzJIMtIkRsI9oEqC0SnxaM7zY+ESI2ESdFLjrYRQC3RQDyHBEiFhBjs3tI2umBkDTv06Z5mziJELGIIAWzdvikCd4Ev7wvQsQSghz4UlCnZIYU4Or7IkQsIKYgbovCJCibYlkcCBMhYgnRHrzI5jYFcdPEGTdfESKWECdNEDJQ0m5ebWFChIgNBA1Cksy3CVEano8HRhEiFhCkedgczugg+6uvEyFiC9EUCl4N9KPEp5k8EyFiCZEGUU4PgGljpcMwIkRsIqbi2DS4lQ5pdKHtwfB2QEWEiAcRpPA7FY6bgXaaDKGNWISIBQQZSqTNEtrAnwYB6EYnQsQmYkpW0gAvGfZth3vJEJkIEVsI0gCZGubTZpa+AFKhLm6GIkQsIk6G0NsBlrTRxUCmp1gRIh5CpEMggafGZZMQ4YF3ESKWEG3hCxd+wQD7UaNfhIglBGkWksIxWVRKtuiQjAgRmwhSJKOD6U1gnjRecGYnQsQLCFIQpoUuGpQpMSLDACJEbCBSA7HZ4FKjpP1gjqZsRIh4EUGKAanIRQ9vzSAKarqIELGAIAOIpGnfNE7oUH380ESIWEKk5CgF3vRmZDMlBenLTVeEiEXE6YB7SmhoQkS+ZESI+FcQU1GYbGJNkYwOtYgQ8W5EkwhNBYU0pEiLFSJEbCOm5vz0htMiSKGhGQI4TopEiCgR5NA1FZZTQtU0IEkzVISITcRPvkSIECFCxNr1G3DtvQpGNs1PAAAAAElFTkSuQmCC" alt="QRCode">
+    </li>
+    
+
+</ul>
+</div>
+        
+    </div>
+</div>
+                </div>
+                <div class="card-body">
+                    
+                        
+                        
+                            <div id="post-toc"><ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题定义</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E8%A7%A3%E6%9E%90props"><span class="post-toc-number">2.</span> <span class="post-toc-text">解析props</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%97%AE%E9%A2%98%E7%BB%86%E5%8C%96"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">问题细化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%A9%E7%94%A8%E6%AD%A3%E5%88%99%E8%BF%9B%E8%A1%8C%E8%A7%A3%E6%9E%90"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">利用正则进行解析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%A9%E7%94%A8eval%E5%92%8Cthis%E6%9E%84%E9%80%A0props"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">利用eval和this构造props</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E5%BB%BAtype%E5%92%8Cprops"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">构建type和props</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#render%E6%B8%B2%E6%9F%93%E8%99%9A%E6%8B%9Fdom%E4%B8%BA%E7%9C%9F%E5%AE%9Edom"><span class="post-toc-number">3.</span> <span class="post-toc-text">render渲染虚拟dom为真实dom</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考链接</span></a></li></ol></div>
+                        
+                    
+                    <article id="post-content">
+                        <h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><p>在转化成虚拟dom节点之后，下一步就是将虚拟dom节点转化为真实的dom节点展示在浏览器中，但是在这之前，还需要将HTML标签中的属性添加到虚拟dom节点的props中，故问题定义如下：</p>
+<ol>
+<li>解析HTML标签的属性，到虚拟dom节点的props中。</li>
+<li>实现一个函数render，将虚拟dom节点转换并挂载到真实dom节点上。</li>
+</ol>
+<h1 id="解析props"><a href="#解析props" class="headerlink" title="解析props"></a>解析props</h1><h2 id="问题细化"><a href="#问题细化" class="headerlink" title="问题细化"></a>问题细化</h2><p>之前已经可以通过对’&lt;’和’&gt;’符号进行标记，拿到HTML标签的内容，但是还未对其内容进行解析，即接下来的任务是从标签内容字符串中解析出标签类型type，和标签属性对象props。即实现一个函数getTypeProps：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> tagContent = <span class="string">`div class=&#x27;test&#x27;  style=&quot;background-color: red;  padding: 2px;&quot;`</span>;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getTypeProps</span>(<span class="params">tagContent</span>)&#123;</span><br><span class="line">    <span class="comment">// code</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">getTypeProps</span>(tagContent));</span><br><span class="line"><span class="comment">// ==&gt;</span></span><br><span class="line"><span class="comment">// &#123;</span></span><br><span class="line"><span class="comment">//     type: &#x27;div&#x27;,</span></span><br><span class="line"><span class="comment">//     props: &#123;</span></span><br><span class="line"><span class="comment">//         class: &#x27;test&#x27;,</span></span><br><span class="line"><span class="comment">//         style: &#x27;background-color: red;  padding: 2px;&#x27;</span></span><br><span class="line"><span class="comment">//     &#125;</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br></pre></td></tr></table></figure>
+<p>目前的框架都是先通过 babel 编译成抽象语法树（AST），然后在编译成对应虚拟 dom 构造函数的调用形式，（ React 是通过babel将 jsx 转换为h函数渲染的形式，而 Vue 是使用 vue-loader 将模版转为 h 函数渲染的形式，但是vue-loader内部本质还是调用的babel进行编译转换）所以不会涉及对字符串的解析。不过本着重头造轮子的原则，这里给出两种简易的的HTML文本解析方法，肯定有考虑不周的地方，敬请指正。</p>
+<h2 id="利用正则进行解析"><a href="#利用正则进行解析" class="headerlink" title="利用正则进行解析"></a>利用正则进行解析</h2><p>首先，先区分出出标签类型文本和标签属性文本：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">resolveTagContent</span>(<span class="params">tagContent</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果未找到空格，则说明整段字符串均为标签类型</span></span><br><span class="line">    <span class="keyword">if</span> (tagContent.<span class="title function_">indexOf</span>(<span class="string">&#x27; &#x27;</span>) == -<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="attr">type</span>: tagContent, <span class="attr">propsStr</span>: <span class="string">&#x27;&#x27;</span> &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 找到空格则截断</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="attr">type</span>: tagContent.<span class="title function_">slice</span>(<span class="number">0</span>, tagContent.<span class="title function_">indexOf</span>(<span class="string">&#x27; &#x27;</span>)),</span><br><span class="line">        <span class="attr">propsStr</span>: tagContent.<span class="title function_">slice</span>(tagContent.<span class="title function_">indexOf</span>(<span class="string">&#x27; &#x27;</span>))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解析出来的propsStr字符串为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">` class=&#x27;test&#x27;  style=&quot;background-color: red;  padding: 2px;&quot;`</span></span><br></pre></td></tr></table></figure>
+
+<p>构建对应正则表达式，<code>[ ]+[a-zA-Z][a-zA-Z0-9-]*</code>表示至少一个空格之后的、由字母开头的、由字母数字或’-‘构成的词；<code>= *&#39;[^&#39;]+&#39;</code>表示等于号后任意空格后有有字符<code>&#39;</code>,并且最有有字符<code>&#39;</code>结尾，中间包含至少一个除了<code>&#39;</code>以外的其他字符。（中间没有字符则匹配不上，如<code>id=&#39;&#39;</code>则不参与匹配）最后的g表示全局匹配多组，利用match函数找出所有匹配的子串。</p>
+<p>对于字符<code>&quot;</code>也是同样的匹配方法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> reg = <span class="regexp">/[ ]+[a-zA-Z][a-zA-Z0-9-]*= *&#x27;[^&#x27;]+&#x27;/g</span>;</span><br><span class="line">propsStr.<span class="title function_">match</span>(reg); <span class="comment">// ==&gt; [` class=&#x27;test&#x27;`]</span></span><br><span class="line">reg = <span class="regexp">/[ ]+[a-zA-Z][a-zA-Z0-9-]*= *&quot;[^&quot;]+&quot;/g</span>;</span><br><span class="line">propsStr.<span class="title function_">match</span>(reg); <span class="comment">// ==&gt; [`  style=&quot;background-color: red;  padding: 2px;&quot;`]</span></span><br></pre></td></tr></table></figure>
+
+<p>故可将解析props对象的函数写成如下形式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getPropsByReg</span>(<span class="params">propsStr</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> res = []; <span class="comment">// 解析结果</span></span><br><span class="line">    <span class="keyword">let</span> regs = [</span><br><span class="line">        <span class="regexp">/[ ]+[a-zA-Z][a-zA-Z0-9-]*= *&#x27;[^&#x27;]+&#x27;/g</span>,</span><br><span class="line">        <span class="regexp">/[ ]+[a-zA-Z][a-zA-Z0-9-]*= *&quot;[^&quot;]+&quot;/g</span></span><br><span class="line">    ];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> reg <span class="keyword">of</span> regs) &#123;</span><br><span class="line">        <span class="keyword">let</span> matched = propsStr.<span class="title function_">match</span>(reg);</span><br><span class="line">        <span class="keyword">if</span> (matched) &#123;</span><br><span class="line">            res = [...res, ...matched.<span class="title function_">map</span>(<span class="function"><span class="params">v</span> =&gt;</span> v.<span class="title function_">trim</span>())];</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> props = &#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> kv <span class="keyword">of</span> res) &#123; <span class="comment">// 遍历结果</span></span><br><span class="line">        <span class="keyword">let</span> [key, value] = kv.<span class="title function_">split</span>(<span class="string">&#x27;=&#x27;</span>).<span class="title function_">map</span>(<span class="function"><span class="params">v</span> =&gt;</span> v.<span class="title function_">trim</span>()); <span class="comment">// 去除左右空格</span></span><br><span class="line">        props[key] = value.<span class="title function_">slice</span>(<span class="number">1</span>, value.<span class="property">length</span> - <span class="number">1</span>); <span class="comment">// 去除value左右的引号（&#x27;和&quot;）</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> props;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用eval和this构造props"><a href="#利用eval和this构造props" class="headerlink" title="利用eval和this构造props"></a>利用eval和this构造props</h2><p>第一步同使用正则表达式，仍旧将type和propsStr分开，得到propsStr，思路是利用eval直接运行propsStr里面的内容，让其创建出对应名称的属性到props对象上，即实现一个函数appendThis，将propsStr中每个属性内容的开头添加<code>this.</code>，结尾添加分号<code>;</code>，再通过new function的构造参数形式构造出一个props对象：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">propsStr = <span class="string">` class=&#x27;test&#x27;  style=&quot;background-color: red;  padding: 2px;&quot;`</span>;</span><br><span class="line">propsStr = <span class="title function_">appendThis</span>(propsStr);</span><br><span class="line"><span class="comment">// ` this.class=&#x27;test&#x27;;  this.style=&quot;background-color: red;  padding: 2px;&quot;;`</span></span><br></pre></td></tr></table></figure>
+
+<p>对于字符串<code>key=&quot;value&quot;</code>大体思路是根据等于号(&#x3D;)定位位置，然后在<code>key</code>的前面加上<code>this.</code>，在<code>&quot;value&quot;</code>的后面加上<code>;</code>，同时考虑等号周位空格的情况<code>key =  &quot;value&quot;;</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">appendThis</span>(<span class="params">propsStr</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> idx = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">let</span> res = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="comment">// idx之后的=符号位置</span></span><br><span class="line">        <span class="keyword">let</span> equalIdx = propsStr.<span class="title function_">indexOf</span>(<span class="string">&#x27;=&#x27;</span>, idx);</span><br><span class="line">        <span class="keyword">if</span> (equalIdx == -<span class="number">1</span>) <span class="keyword">break</span>;</span><br><span class="line">        <span class="comment">// key的最后一个字符</span></span><br><span class="line">        <span class="keyword">let</span> keyEndIdx = equalIdx-<span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 等号前的空格不算</span></span><br><span class="line">        <span class="keyword">while</span>(propsStr[keyEndIdx] == <span class="string">&#x27; &#x27;</span>) keyEndIdx--;</span><br><span class="line">        <span class="comment">// key之前的第一个空格</span></span><br><span class="line">        <span class="keyword">let</span> keyStartIdx = propsStr.<span class="title function_">lastIndexOf</span>(<span class="string">&#x27; &#x27;</span>, keyEndIdx);</span><br><span class="line">        <span class="comment">// 从equalIdx开始，搜索第一个&#x27;或&quot;字符位置</span></span><br><span class="line">        <span class="keyword">let</span> valueStart = <span class="title function_">searchIndexOf</span>(propsStr, <span class="regexp">/[&#x27;&quot;]/</span>, equalIdx);</span><br><span class="line">        <span class="keyword">if</span> (valueStart == -<span class="number">1</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`输入不合法<span class="subst">$&#123;propsStr&#125;</span>`</span>);</span><br><span class="line">        <span class="comment">// 第二个&#x27;或&quot;的位置表示value的结尾</span></span><br><span class="line">        <span class="keyword">let</span> valueEnd = propsStr.<span class="title function_">indexOf</span>(propsStr[valueStart], valueStart + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (valueEnd == -<span class="number">1</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`输入不合法<span class="subst">$&#123;propsStr&#125;</span>`</span>);</span><br><span class="line">        res += propsStr.<span class="title function_">slice</span>(idx, keyStartIdx + <span class="number">1</span>) + <span class="string">&#x27;this.&#x27;</span>;</span><br><span class="line">        res += propsStr.<span class="title function_">slice</span>(keyStartIdx + <span class="number">1</span>, valueEnd + <span class="number">1</span>);</span><br><span class="line">        res += <span class="string">&#x27;;&#x27;</span>;</span><br><span class="line">        idx = valueEnd + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    res += propsStr.<span class="title function_">slice</span>(idx);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">searchIndexOf</span>(<span class="params">str, reg, startIdx</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> temp = str.<span class="title function_">slice</span>(startIdx);</span><br><span class="line">    <span class="keyword">let</span> targetIdx = temp.<span class="title function_">search</span>(reg);</span><br><span class="line">    <span class="keyword">if</span> (targetIdx == -<span class="number">1</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> targetIdx + str.<span class="property">length</span> - temp.<span class="property">length</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中由于要同时匹配’和”字符，但是indexOf不支持正则表达式，search不支持从中间查找，所以自行封装了支持正则表达式的可从中间查找的函数searchIndexOf。（<a target="_blank" rel="noopener" href="http://m.biancheng.net/view/5581.html">indexOf与match区别</a>）</p>
+<p>创建props实现如下，这里为了防止用new构建出来的props留有构造函数的引用而导致内存泄漏，使用Object.assign进行了浅拷贝：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getPropsByEval</span>(<span class="params">propsStr</span>) &#123;</span><br><span class="line">    propsStr = <span class="title function_">appendThis</span>(propsStr);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(propsStr);</span><br><span class="line">    <span class="keyword">let</span> props = <span class="keyword">new</span> <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">            <span class="built_in">eval</span>(propsStr);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 防止内存泄漏，避免constructor和__proto__对匿名函数留有的引用</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, props);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="构建type和props"><a href="#构建type和props" class="headerlink" title="构建type和props"></a>构建type和props</h2><p>综上，解析type和props实现如下，暂时采用eval+this的方法对props进行创建：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getTypeProps</span>(<span class="params">tagContent</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; type, propsStr &#125; = <span class="title function_">resolveTagContent</span>(tagContent);</span><br><span class="line">    <span class="keyword">let</span> props = <span class="title function_">getProps</span>(propsStr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        type,</span><br><span class="line">        props</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getProps</span>(<span class="params">propsStr</span>) &#123;</span><br><span class="line">    <span class="comment">// return getPropsByReg(propsStr);</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">getPropsByEval</span>(propsStr)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后只需要在之前的trans函数中，调用getTypeProps得到type和props，再进行虚拟dom的创建：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> &#123; type, props &#125; = <span class="title function_">getTypeProps</span>(tagContent);</span><br><span class="line"><span class="keyword">if</span> (!token.<span class="title function_">has</span>(type)) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`未找到对应标签名<span class="subst">$&#123;type&#125;</span>`</span>);</span><br><span class="line">&#125;</span><br><span class="line">vEleHandle.<span class="title function_">addElements</span>(type, props, [], stack.<span class="property">length</span>);</span><br></pre></td></tr></table></figure>
+
+<h1 id="render渲染虚拟dom为真实dom"><a href="#render渲染虚拟dom为真实dom" class="headerlink" title="render渲染虚拟dom为真实dom"></a>render渲染虚拟dom为真实dom</h1><p>渲染虚拟dom成真实dom主要就是利用<code>document.createTextNode</code>创建文本节点，<code>document.createElement</code>和<code>appendChild</code>创建和添加真实节点，通过递归调用的形式对虚拟dom树进行遍历，其中render接收两个参数，第一个是当前虚拟dom节点，第二个是该虚拟dom节点对应的父真实dom节点。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> targetDom = <span class="title class_">Symbol</span>(<span class="string">&#x27;targetDom&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">render</span>(<span class="params">vdom, parentElement</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!vdom) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span> (!parentElement) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;未绑定dom节点&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> &#123; type, props, children &#125; = vdom;</span><br><span class="line">    <span class="keyword">if</span> (type === <span class="string">&#x27;text&#x27;</span>) &#123; <span class="comment">// 创建文本节点</span></span><br><span class="line">        <span class="keyword">let</span> ele = <span class="variable language_">document</span>.<span class="title function_">createTextNode</span>(props.<span class="property">value</span>);</span><br><span class="line">        vdom[targetDom] = ele;</span><br><span class="line">        parentElement.<span class="title function_">appendChild</span>(ele);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> ele = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(type);</span><br><span class="line">    <span class="title function_">setProps</span>(ele, props);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> childVdom <span class="keyword">of</span> children) &#123;</span><br><span class="line">        <span class="title function_">render</span>(childVdom, ele);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 虚拟dom指向真实dom</span></span><br><span class="line">    vdom[targetDom] = ele;</span><br><span class="line">    <span class="comment">// 最后再将dom元素添加到真实dom树中</span></span><br><span class="line">    parentElement.<span class="title function_">appendChild</span>(ele);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">setProps</span>(<span class="params">element, props</span>) &#123;</span><br><span class="line">    <span class="title class_">Object</span>.<span class="title function_">entries</span>(props).<span class="title function_">forEach</span>(<span class="function">(<span class="params">[key, value]</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">setProp</span>(element, key, value);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">setProp</span>(<span class="params">element, key, value</span>) &#123;</span><br><span class="line">    key === <span class="string">&#x27;className&#x27;</span> ? <span class="string">&#x27;class&#x27;</span> : key;</span><br><span class="line">    element.<span class="title function_">setAttribute</span>(key, value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7146996646394462239">https://juejin.cn/post/7146996646394462239</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903806132568072#heading-2">https://juejin.cn/post/6844903806132568072#heading-2</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000019510611">https://segmentfault.com/a/1190000019510611</a></p>
+
+                    </article>
+                    
+
+
+    <blockquote id="date-expire-notification" class="post-expired-notify">本文最后更新于 <span id="date-expire-num"></span> 天前，文中所描述的信息可能已发生改变</blockquote>
+    <script>
+    (function() {
+        var dateUpdate = Date.parse("2022-10-09");
+        var nowDate = new Date();
+        var a = nowDate.getTime();
+        var b = a - dateUpdate;
+        var daysUpdateExpire = Math.floor(b/(24*3600*1000));
+        if (daysUpdateExpire >= 120) {
+            document.getElementById('date-expire-num').innerHTML = daysUpdateExpire;
+        } else {
+            document.getElementById('date-expire-notification').style.display = 'none';
+        }
+    })();
+    </script>
+
+
+<p class="post-footer-info mb-0 pt-0">本文发表于&nbsp;<time datetime="2022-10-08T12:17:48.000Z" itemprop="datePublished">2022-10-08</time>
+
+    , 最后修改于&nbsp;<time datetime="2022-10-09T03:45:39.158Z" itemprop="dateModified">2022-10-09</time>
+
+</p>
+<p class="post-footer-info mb-0 pt-2">
+
+
+
+<span class="post-tags-list mt-2">
+
+<a class="post-tags-list-item" href="/tags/JavaScript/" rel="tag">#&nbsp;JavaScript</a>
+
+<a class="post-tags-list-item" href="/tags/%E8%99%9A%E6%8B%9Fdom/" rel="tag">#&nbsp;虚拟dom</a>
+
+<a class="post-tags-list-item" href="/tags/MVVM/" rel="tag">#&nbsp;MVVM</a>
+
+<a class="post-tags-list-item" href="/tags/vue/" rel="tag">#&nbsp;vue</a>
+
+<a class="post-tags-list-item" href="/tags/react/" rel="tag">#&nbsp;react</a>
+
+<a class="post-tags-list-item" href="/tags/render/" rel="tag">#&nbsp;render</a>
+
+<a class="post-tags-list-item" href="/tags/%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/" rel="tag">#&nbsp;词法分析</a>
+
+<a class="post-tags-list-item" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">#&nbsp;正则表达式</a>
+
+</span>
+
+
+</p>
+
+                </div>
+                <div class="post-nav px-2 bg-gray">
+<ul class="pagination">
+    <!-- Prev Nav -->
+    
+        <li class="page-item page-prev">
+            <a href="/2022/10/09/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step3-jsx%E5%AD%90%E9%9B%86%E8%A7%A3%E6%9E%90/" rel="prev">
+                <div class="page-item-title"><i class="icon icon-back" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step3-jsx子集解析</div>
+            </a>
+        </li>
+    
+
+    <!-- Next Nav -->
+    
+        <li class="page-item page-next">
+            <a href="/2022/10/06/%E6%89%8B%E5%86%99MVVM%E6%A1%86%E6%9E%B6-step1-HTML%E4%B8%8E%E8%99%9A%E6%8B%9Fdom%E8%BD%AC%E6%8D%A2/" rel="next">
+                <div class="page-item-title"><i class="icon icon-forward" aria-hidden="true"></i></div>
+                <div class="page-item-subtitle">手写MVVM框架-step1-HTML与虚拟dom转换</div>
+            </a>
+        </li>
+    
+</ul>
+</div>
+
+                
+                    <!-- # Comment # -->
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- ### Footer ### -->
+            <footer class="text-center">
+    <!-- footer copyright -->
+    
+        <p class="footer-copyright mb-0">Copyright&nbsp;©&nbsp;<span id="copyright-year"></span>
+            <a class="footer-copyright-a" href="http://example.com">李朝晖的blog</a>
+        </p>
+
+    <!-- footer custom text -->
+    <p class="footer-text mb-0">
+    
+    </p>
+    <!-- footer develop info -->
+    <p class="footer-develop mb-0">
+        
+    <!-- Busuanzi User Views -->
+    <span id="busuanzi_container_site_uv" hidden>
+        <span></span>
+        <span id="busuanzi_value_site_uv"></span>
+        <span>Viewers</span>
+        
+            <span>|</span>
+        
+    </span>
+
+
+
+
+        
+        Powered by&nbsp;<!--
+         --><a href="https://hexo.io" target="_blank" class="footer-develop-a" rel="external nofollow noopener noreferrer">Hexo</a><span class="footer-develop-divider"></span>Theme&nbsp;-&nbsp;<!--
+         --><a href="https://github.com/SukkaW/hexo-theme-suka" target="_blank" class="footer-develop-a" rel="external noopener">Suka</a>
+    </p>
+</footer>
+
+
+        <!-- ### Import File ### -->
+        <!-- ### Footer JS Import ### -->
+
+<script>
+
+    
+window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 50
+};
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
+console.log('\n %c Suka Theme (hexo-theme-suka) | © SukkaW | Verision 1.3.3 %c https://github.com/SukkaW/hexo-theme-suka \n', 'color: #fff; background: #444; padding:5px 0;', 'background: #bbb; padding:5px 0;');
+
+</script>
+
+<script src="/lib/vanilla-lazyload/lazyload.min.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js" async></script>
+
+
+<!-- Offset -->
+
+
+
+
+<!-- Comment -->
+
+
+<!-- ### Custom Footer ### -->
+
+    </body>
+
+</html>
